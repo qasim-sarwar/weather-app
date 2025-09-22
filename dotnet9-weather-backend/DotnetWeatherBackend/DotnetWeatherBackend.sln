@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36511.14 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetWeatherBackend", "DotnetWeatherBackend.csproj", "{F283EFA8-DFC0-42BF-82F9-40062C8AAF0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F283EFA8-DFC0-42BF-82F9-40062C8AAF0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F283EFA8-DFC0-42BF-82F9-40062C8AAF0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F283EFA8-DFC0-42BF-82F9-40062C8AAF0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F283EFA8-DFC0-42BF-82F9-40062C8AAF0A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {19BB1A5A-95CF-4A03-9B9F-02E4E6537C7B}
+	EndGlobalSection
+EndGlobal
