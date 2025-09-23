@@ -1,99 +1,85 @@
-
 <main class="main">
   <div class="content">
     <h1>Angular 19 Weather App</h1>
     <h2 class="subtitle">
-      Insert Latitude and Longitude to Fetch Live Weather Data
+      Fetch Live Weather Data
     </h2>
-    <div class="weather-form">
-      <div class="input-row">
-        <input
-          type="number"
-          [(ngModel)]="latitude"
-          placeholder="Latitude"
-          step="any"
-          class="weather-input"
-        />
-        <input
-          type="number"
-          [(ngModel)]="longitude"
-          placeholder="Longitude"
-          step="any"
-          class="weather-input"
-        />
+
+    <div class="weather-form-row">
+      <!-- City Search -->
+      <div class="weather-form-section">
+        <form #cityForm="ngForm" (ngSubmit)="fetchWeatherByCity()" autocomplete="off">
+          <div class="input-row">
+            <input
+              type="text"
+              name="city"
+              [(ngModel)]="city"
+              placeholder="City Name"
+              class="weather-input"
+              required
+              pattern="^[a-zA-Z\s\-]+$"
+              #cityInput="ngModel"
+              (keydown.enter)="fetchWeatherByCity()"
+            />
+          </div>
+          <div *ngIf="cityInput.invalid && (cityInput.dirty || cityInput.touched)" class="error-msg">
+            <span *ngIf="cityInput.errors?.['required']">City name is required.</span>
+          </div>
+          <div *ngIf="cityInput.invalid && cityInput.errors?.['pattern'] && (cityInput.dirty || cityInput.touched)" class="error-msg">
+            Only letters, spaces, and hyphens are allowed.
+          </div>
+          <button [disabled]="cityInput.invalid" class="weather-btn">
+            Fetch by City
+          </button>
+        </form>
       </div>
-      <button
-        (click)="fetchWeatherByLatLon()"
-        class="weather-btn"
-      >
-        Fetch Weather
-      </button>
+
+      <div class="weather-divider"></div>
+
+      <!-- Lat / Lon Search -->
+      <div class="weather-form-section">
+        <div class="input-row">
+          <input
+            type="number"
+            [(ngModel)]="latitude"
+            placeholder="Latitude"
+            step="any"
+            class="weather-input"
+            (keydown.enter)="fetchWeatherByLatLon()"
+          />
+          <input
+            type="number"
+            [(ngModel)]="longitude"
+            placeholder="Longitude"
+            step="any"
+            class="weather-input"
+            (keydown.enter)="fetchWeatherByLatLon()"
+          />
+        </div>
+        <button (click)="fetchWeatherByLatLon()" class="weather-btn">
+          Fetch by Latitude/Longitude
+        </button>
+      </div>
     </div>
+
     <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
-    <div
-      *ngIf="weather"
-      class="weather-result"
-    >
-      <h3>Current Weather</h3>
-      <p>
-        <span class="icon">
-          <!-- Latitude SVG -->
-          <svg width="20" height="20" fill="#1976d2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
+
+    <div *ngIf="weather" class="weather-result">
+      <h3>
+        Current Weather of
+        <span *ngIf="weather.city">{{ weather.city }}</span>
+        <span *ngIf="!weather.city">
+          ({{ weather.latitude }}, {{ weather.longitude }})
         </span>
-        <strong>Latitude:</strong> {{ weather.latitude }}
-      </p>
-      <p>
-        <span class="icon">
-          <!-- Longitude SVG -->
-          <svg width="20" height="20" fill="#1976d2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
-        </span>
-        <strong>Longitude:</strong> {{ weather.longitude }}
-      </p>
-      <p>
-        <span class="icon">
-          <!-- Temperature SVG -->
-          <svg width="20" height="20" fill="#e53935" viewBox="0 0 24 24"><path d="M6 14a6 6 0 1 0 12 0c0-3.31-2.69-6-6-6s-6 2.69-6 6zm6-10a2 2 0 0 1 2 2v6a2 2 0 1 1-4 0V6a2 2 0 0 1 2-2z"/></svg>
-        </span>
-        <strong>Temperature:</strong> {{ weather.current_weather?.temperature }} °C
-      </p>
-      <p>
-        <span class="icon">
-          <!-- Windspeed SVG -->
-          <svg width="20" height="20" fill="#0288d1" viewBox="0 0 24 24"><path d="M4 12h16v2H4zm0-4h10v2H4zm0 8h7v2H4z"/></svg>
-        </span>
-        <strong>Windspeed:</strong> {{ weather.current_weather?.windspeed }} km/h
-      </p>
-      <p>
-        <span class="icon">
-          <!-- Wind Direction SVG -->
-          <svg width="20" height="20" fill="#43a047" viewBox="0 0 24 24"><path d="M12 2l4 8h-8l4-8zm0 20v-8h-4l4 8zm0-8h8l-4-8-4 8z"/></svg>
-        </span>
-        <strong>Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°
-      </p>
-      <p>
-        <span class="icon">
-          <!-- Time SVG -->
-          <svg width="20" height="20" fill="#6d4c41" viewBox="0 0 24 24"><path d="M12 8v5l4.28 2.54.72-1.21-3.5-2.08V8z"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
-        </span>
-        <strong>Time:</strong>
-        {{ weather.current_weather?.time | date:'medium' }}
-      </p>
-      <p>
-        <span class="icon">
-          <!-- Weather Code SVG -->
-          <svg width="20" height="20" fill="#fbc02d" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg>
-        </span>
-        <strong>Weather Code:</strong> {{ weather.current_weather?.weathercode }}
-      </p>
+      </h3>
+      <p><strong>🌍 Latitude:</strong> {{ weather.latitude }}</p>
+      <p><strong>🌏 Longitude:</strong> {{ weather.longitude }}</p>
+      <p><strong>🌡️ Temperature:</strong> {{ weather.current_weather?.temperature }} °C</p>
+      <p><strong>💨 Windspeed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
+      <p><strong>🧭 Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°</p>
+      <p><strong>⏰ Time:</strong> {{ weather.current_weather?.time | date:'medium' }}</p>
+      <p><strong>🌦️ Weather Code:</strong> {{ weather.current_weather?.weathercode }}</p>
     </div>
   </div>
 </main>
 <router-outlet />
-
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->

@@ -7,13 +7,18 @@ The backend consumes the Open-Meteo API that fetches real-time weather data usin
  (no API key required) to fetch live weather data, while the frontend provides a simple interface for users to input latitude and longitude and view the current weather conditions.
 
 ## 🚀 Features
+- Search weather by **city name**
+- Search weather by **latitude and longitude**
+- Responsive design
+- Middleware in .NET backend to **rate-limit abusive requests**:
+  - 10,000 requests per day
+  - 5,000 requests per hour
+  - 600 requests per minute
 - Node.js backend with Express
 - Weather data from Open-Meteo (no API key required)
 - Angular frontend with user input for latitude & longitude
 - Centralized error handling on backend
 - Clean separation of backend and frontend codebases
-
----
 
 ## 📂 Project Structure
 weather-app/

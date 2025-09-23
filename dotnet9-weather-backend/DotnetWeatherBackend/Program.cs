@@ -1,3 +1,8 @@
+﻿using Microsoft.AspNetCore.RateLimiting;
+using System.Runtime.ConstrainedExecution;
+using System.Text.Json;
+using System.Threading.RateLimiting;
+
 namespace DotnetWeatherBackend
 {
     public class Program
@@ -7,6 +12,41 @@ namespace DotnetWeatherBackend
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddAuthorization();
+
+            // Add rate limiting middleware
+            // If a client exceeds any one (minute/hour/day) limit, they’ll get HTTP 503 Service Unavailable
+            // By default, limits apply per client IP(RemoteIpAddress).
+            // Throttling: queues or delays excess requests instead of blocking is configured with QueueLimit > 0
+            builder.Services.AddRateLimiter(options =>
+            {
+                // per minute < 600 requests
+                options.AddFixedWindowLimiter("PerMinute", opt =>
+                {
+                    opt.PermitLimit = 600;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+
+                // per hour < 5,000 requests
+                options.AddFixedWindowLimiter("PerHour", opt =>
+                {
+                    opt.PermitLimit = 5000;
+                    opt.Window = TimeSpan.FromHours(1);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+
+                // per day < 10,000 requests
+                options.AddFixedWindowLimiter("PerDay", opt =>
+                {
+                    opt.PermitLimit = 10000;
+                    opt.Window = TimeSpan.FromDays(1);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 0;
+                });
+            });
+
             builder.Services.AddHttpClient();
             builder.Services.AddCors(options =>
             {
@@ -29,6 +69,9 @@ namespace DotnetWeatherBackend
             app.UseCors("AllowAngular");
             app.UseAuthorization();
 
+            // Enable global rate limiting
+            app.UseRateLimiter();
+
             // Match Angular service params (lat, lon, city)
             app.MapGet("/api/weather", async (string? city, double? lat, double? lon, IHttpClientFactory httpClientFactory) =>
             {
@@ -37,17 +80,16 @@ namespace DotnetWeatherBackend
 
                 if (!string.IsNullOrEmpty(city))
                 {
-                    // Example: use Open-Meteo geocoding to get lat/lon by city
                     var geoUrl = $"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1";
-                    var geo = await client.GetFromJsonAsync<dynamic>(geoUrl);
+                    var geo = await client.GetFromJsonAsync<JsonElement>(geoUrl);
 
-                    if (geo?["results"] == null || geo["results"].Count == 0)
+                    if (!geo.TryGetProperty("results", out var results) || results.GetArrayLength() == 0)
                     {
                         return Results.NotFound(new { error = "City not found" });
                     }
 
-                    lat = (double)geo["results"][0]["latitude"];
-                    lon = (double)geo["results"][0]["longitude"];
+                    lat = results[0].GetProperty("latitude").GetDouble();
+                    lon = results[0].GetProperty("longitude").GetDouble();
                 }
 
                 if (lat == null || lon == null)
@@ -67,7 +109,11 @@ namespace DotnetWeatherBackend
                     return Results.Problem($"Failed to fetch weather: {ex.Message}");
                 }
             })
-            .WithName("GetWeather");
+            .WithName("GetWeather")
+            // Apply rate limiting policies here
+            .RequireRateLimiting("PerMinute")
+            .RequireRateLimiting("PerHour")
+            .RequireRateLimiting("PerDay");
 
             app.Run();
         }

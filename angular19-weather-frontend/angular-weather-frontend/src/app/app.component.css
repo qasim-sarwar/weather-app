@@ -251,6 +251,27 @@ p {
   max-width: 350px;
 }
 
+.weather-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.weather-form-section {
+  flex: 1;
+  min-width: 220px;
+}
+
+.weather-divider {
+  width: 2px;
+  height: 80px;
+  background: #ccc;
+  margin: 0 1rem;
+  border-radius: 1px;
+}
+
 .weather-result p {
   margin: 0.3rem 0;
   font-size: 1rem;
