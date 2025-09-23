@@ -19,12 +19,14 @@ The backend consumes the Open-Meteo API that fetches real-time weather data usin
 - Angular frontend with user input for latitude & longitude
 - Centralized error handling on backend
 - Clean separation of backend and frontend codebases
+- Clean separation of backend and frontend codebases
 
 ## 📂 Project Structure
 weather-app/
 ├── angular-frontend/     # Angular application (UI)
 ├── node-backend/         # Node.js + Express backend
-├── dotnet-backend/       # .NET 8 Minimal API backend
+├── DotnetWeatherBackend/       # .NET 9 Minimal API backend
+├── DotnetWeatherBackend.Tests/ # .NET 9 Minimal API compatible xUnit Project
 └── README.md             # Project documentation
 
 
