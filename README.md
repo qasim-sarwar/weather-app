@@ -19,7 +19,7 @@ The backend consumes the Open-Meteo API that fetches real-time weather data usin
 - Angular frontend with user input for latitude & longitude
 - Centralized error handling on backend
 - Clean separation of backend and frontend codebases
-- Clean separation of backend and frontend codebases
+- Added Cache to store results in memory for same city to save API from abuse
 
 ## 📂 Project Structure
 weather-app/
