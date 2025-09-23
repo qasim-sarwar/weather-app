@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.RateLimiting;
-using System.Text.Json;
 using System.Threading.RateLimiting;
 
 namespace DotnetWeatherBackend
@@ -12,13 +11,15 @@ namespace DotnetWeatherBackend
 
             builder.Services.AddAuthorization();
 
+            // Register caching with options and WeatherService
+            builder.Services.AddMemoryCache();
+            builder.Services.Configure<WeatherApiOptions>(
+                builder.Configuration.GetSection("WeatherApiOptions"));
+            builder.Services.AddScoped<WeatherService>();
+
             // Add rate limiting middleware
-            // If a client exceeds any one (minute/hour/day) limit, they’ll get HTTP 503 Service Unavailable
-            // By default, limits apply per client IP(RemoteIpAddress).
-            // Throttling: queues or delays excess requests instead of blocking is configured with QueueLimit > 0
             builder.Services.AddRateLimiter(options =>
             {
-                // per minute < 600 requests
                 options.AddFixedWindowLimiter("PerMinute", opt =>
                 {
                     opt.PermitLimit = 600;
@@ -27,7 +28,6 @@ namespace DotnetWeatherBackend
                     opt.QueueLimit = 0;
                 });
 
-                // per hour < 5,000 requests
                 options.AddFixedWindowLimiter("PerHour", opt =>
                 {
                     opt.PermitLimit = 5000;
@@ -36,7 +36,6 @@ namespace DotnetWeatherBackend
                     opt.QueueLimit = 0;
                 });
 
-                // per day < 10,000 requests
                 options.AddFixedWindowLimiter("PerDay", opt =>
                 {
                     opt.PermitLimit = 10000;
@@ -56,7 +55,6 @@ namespace DotnetWeatherBackend
             });
 
             builder.Services.AddOpenApi();
-            builder.Services.AddScoped<WeatherService>();
 
             var app = builder.Build();
 
@@ -86,7 +84,6 @@ namespace DotnetWeatherBackend
                 };
             })
             .WithName("GetWeather")
-            // Apply rate limiting policies here
             .RequireRateLimiting("PerMinute")
             .RequireRateLimiting("PerHour")
             .RequireRateLimiting("PerDay");
