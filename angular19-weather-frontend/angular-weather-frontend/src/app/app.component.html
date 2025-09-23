@@ -22,9 +22,6 @@
               (keydown.enter)="fetchWeatherByCity()"
             />
           </div>
-          <div *ngIf="cityInput.invalid && (cityInput.dirty || cityInput.touched)" class="error-msg">
-            <span *ngIf="cityInput.errors?.['required']">City name is required.</span>
-          </div>
           <div *ngIf="cityInput.invalid && cityInput.errors?.['pattern'] && (cityInput.dirty || cityInput.touched)" class="error-msg">
             Only letters, spaces, and hyphens are allowed.
           </div>

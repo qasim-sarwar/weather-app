@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.RateLimiting;
-using System.Runtime.ConstrainedExecution;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 
@@ -57,6 +56,7 @@ namespace DotnetWeatherBackend
             });
 
             builder.Services.AddOpenApi();
+            builder.Services.AddScoped<WeatherService>();
 
             var app = builder.Build();
 
@@ -73,41 +73,17 @@ namespace DotnetWeatherBackend
             app.UseRateLimiter();
 
             // Match Angular service params (lat, lon, city)
-            app.MapGet("/api/weather", async (string? city, double? lat, double? lon, IHttpClientFactory httpClientFactory) =>
+            app.MapGet("/api/weather", async (string? city, double? lat, double? lon, WeatherService weatherService) =>
             {
-                var client = httpClientFactory.CreateClient();
-                string url;
+                var (result, statusCode) = await weatherService.GetWeatherAsync(city, lat, lon);
 
-                if (!string.IsNullOrEmpty(city))
+                return statusCode switch
                 {
-                    var geoUrl = $"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1";
-                    var geo = await client.GetFromJsonAsync<JsonElement>(geoUrl);
-
-                    if (!geo.TryGetProperty("results", out var results) || results.GetArrayLength() == 0)
-                    {
-                        return Results.NotFound(new { error = "City not found" });
-                    }
-
-                    lat = results[0].GetProperty("latitude").GetDouble();
-                    lon = results[0].GetProperty("longitude").GetDouble();
-                }
-
-                if (lat == null || lon == null)
-                {
-                    return Results.BadRequest(new { error = "Either city or lat/lon must be provided" });
-                }
-
-                url = $"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true";
-
-                try
-                {
-                    var response = await client.GetFromJsonAsync<object>(url);
-                    return Results.Ok(response);
-                }
-                catch (Exception ex)
-                {
-                    return Results.Problem($"Failed to fetch weather: {ex.Message}");
-                }
+                    200 => Results.Ok(result),
+                    400 => Results.BadRequest(result),
+                    404 => Results.NotFound(result),
+                    _ => Results.Problem(result?.ToString())
+                };
             })
             .WithName("GetWeather")
             // Apply rate limiting policies here

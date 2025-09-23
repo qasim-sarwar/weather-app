@@ -23,6 +23,10 @@ export class AppComponent {
   constructor(private weatherService: WeatherService) {}
 
   fetchWeatherByCity() {
+    // Reset latitude and longitude when searching by city
+    this.latitude = null;
+    this.longitude = null;
+
     if (!this.city || this.city.trim().length === 0) {
       this.weather = null;
       this.errorMsg = 'Please enter a valid city name.';
@@ -48,6 +52,9 @@ export class AppComponent {
   }
 
   fetchWeatherByLatLon() {
+    // Reset city when searching by lat/lon
+    this.city = '';
+
     if (this.latitude == null || this.longitude == null) {
       this.weather = null;
       this.errorMsg = 'Please enter both latitude and longitude.';
