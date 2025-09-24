@@ -68,7 +68,7 @@ namespace DotnetWeatherBackend
                 {
                     city = city.Trim().ToLower();
 
-                    if (!_cache.TryGetValue(city, out (double lat, double lon) coords))
+                    if (!_cache.TryGetValue(city, out (double lat, double lon) coOrds))
                     {
                         var geoUrl = $"{_options.GeoUrl}?name={city}&count=1";
                         var geoResponse = await client.GetFromJsonAsync<GeoResponse>(geoUrl);
@@ -79,20 +79,31 @@ namespace DotnetWeatherBackend
                             return (new { error = "City not found" }, 404);
                         }
 
-                        coords = (geoResponse.results[0].latitude, geoResponse.results[0].longitude);
+                        coOrds = (geoResponse.results[0].latitude, geoResponse.results[0].longitude);
 
                         // Cache result for 30 minutes
-                        _cache.Set(city, coords, TimeSpan.FromMinutes(30));
+                        _cache.Set(city, coOrds, TimeSpan.FromMinutes(30));
                     }
 
-                    lat = coords.lat;
-                    lon = coords.lon;
+                    lat = coOrds.lat;
+                    lon = coOrds.lon;
                 }
 
                 // Validate input
                 if (lat == null || lon == null)
                 {
                     return (new { error = "Either city or lat/lon must be provided" }, 400);
+                }
+
+                // Create a cache key for weather data
+                string weatherCacheKey = city != null
+                    ? $"weather:{city}"
+                    : $"weather:{lat}:{lon}";
+
+                // Try to get weather data from cache
+                if (_cache.TryGetValue(weatherCacheKey, out ForecastResponse cachedForecast))
+                {
+                    return (cachedForecast, 200);
                 }
 
                 // Call forecast API
@@ -109,6 +120,10 @@ namespace DotnetWeatherBackend
                 }
 
                 var forecast = await response.Content.ReadFromJsonAsync<ForecastResponse>();
+
+                // Cache weather data for 10 minutes
+                _cache.Set(weatherCacheKey, forecast, TimeSpan.FromMinutes(10));
+
                 return (forecast!, 200);
             }
             catch (HttpRequestException ex)

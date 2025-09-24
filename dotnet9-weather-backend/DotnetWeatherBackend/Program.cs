@@ -9,6 +9,10 @@ namespace DotnetWeatherBackend
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Add Swagger support
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
             builder.Services.AddAuthorization();
 
             // Register caching with options and WeatherService
@@ -61,6 +65,8 @@ namespace DotnetWeatherBackend
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
