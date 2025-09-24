@@ -40,18 +40,18 @@ namespace DotnetWeatherBackend
 
     public class WeatherService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _client;
         private readonly IMemoryCache _cache;
         private readonly WeatherApiOptions _options;
         private readonly ILogger<WeatherService> _logger;
 
         public WeatherService(
-            IHttpClientFactory httpClientFactory,
+            HttpClient client,
             IMemoryCache cache,
             IOptions<WeatherApiOptions> options,
             ILogger<WeatherService> logger)
         {
-            _httpClientFactory = httpClientFactory;
+            _client = client;
             _cache = cache;
             _options = options.Value;
             _logger = logger;
@@ -61,8 +61,6 @@ namespace DotnetWeatherBackend
         {
             try
             {
-                var client = _httpClientFactory.CreateClient();
-
                 // If city is provided, resolve lat/lon (with caching)
                 if (!string.IsNullOrWhiteSpace(city))
                 {
@@ -71,7 +69,7 @@ namespace DotnetWeatherBackend
                     if (!_cache.TryGetValue(city, out (double lat, double lon) coOrds))
                     {
                         var geoUrl = $"{_options.GeoUrl}?name={city}&count=1";
-                        var geoResponse = await client.GetFromJsonAsync<GeoResponse>(geoUrl);
+                        var geoResponse = await _client.GetFromJsonAsync<GeoResponse>(geoUrl);
 
                         if (geoResponse?.results == null || geoResponse.results.Count == 0)
                         {
@@ -108,7 +106,7 @@ namespace DotnetWeatherBackend
 
                 // Call forecast API
                 var url = $"{_options.ForecastUrl}?latitude={lat}&longitude={lon}&current_weather=true";
-                var response = await client.GetAsync(url);
+                var response = await _client.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
                 {

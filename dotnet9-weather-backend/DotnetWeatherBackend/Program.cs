@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.RateLimiting;
+using Polly;
+using Polly.Extensions.Http;
 using System.Threading.RateLimiting;
 
 namespace DotnetWeatherBackend
@@ -49,7 +51,11 @@ namespace DotnetWeatherBackend
                 });
             });
 
-            builder.Services.AddHttpClient();
+            // Add HttpClient with Polly policies
+            builder.Services.AddHttpClient("WeatherClient")
+                .AddPolicyHandler(GetRetryPolicy())
+                .AddPolicyHandler(GetCircuitBreakerPolicy());
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAngular", policy =>
@@ -95,6 +101,36 @@ namespace DotnetWeatherBackend
             .RequireRateLimiting("PerDay");
 
             app.Run();
+        }
+
+        // Retry: up to 3 retries with exponential backoff (2s → 4s → 8s).
+        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)), // 2s, 4s, 8s
+                    onRetry: (outcome, timespan, retryAttempt, context) =>
+                    {
+                        Console.WriteLine($"Retry {retryAttempt} after {timespan.TotalSeconds}s: {outcome.Exception?.Message ?? outcome.Result.StatusCode.ToString()}");
+                    });
+        }
+
+        private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 5,
+                    durationOfBreak: TimeSpan.FromSeconds(30),
+                    onBreak: (outcome, breakDelay) =>
+                    {
+                        Console.WriteLine($"Circuit opened for {breakDelay.TotalSeconds}s: {outcome.Exception?.Message ?? outcome.Result.StatusCode.ToString()}");
+                    },
+                    onReset: () => Console.WriteLine("Circuit closed, requests flowing again."),
+                    onHalfOpen: () => Console.WriteLine("Circuit half-open, testing the waters.")
+                );
         }
     }
 }

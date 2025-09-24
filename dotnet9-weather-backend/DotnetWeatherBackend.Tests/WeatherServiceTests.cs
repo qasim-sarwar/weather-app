@@ -8,12 +8,9 @@ using System.Net;
 using System.Text;
 
 public class WeatherServiceTests
-{
-    private static WeatherService CreateService(HttpMessageHandler handler)
+{    private static WeatherService CreateService(HttpMessageHandler handler)
     {
         var client = new HttpClient(handler);
-        var mockFactory = new Mock<IHttpClientFactory>();
-        mockFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client);
 
         // Mock IOptions<WeatherApiOptions>
         var options = Options.Create(new WeatherApiOptions
@@ -28,9 +25,9 @@ public class WeatherServiceTests
         // Create mock ILogger<WeatherService>
         var mockLogger = new Mock<ILogger<WeatherService>>();
 
-        // Instantiate WeatherService
+        // Instantiate WeatherService with HttpClient (not IHttpClientFactory anymore)
         return new WeatherService(
-            mockFactory.Object,
+            client,
             memoryCache,
             options,
             mockLogger.Object
