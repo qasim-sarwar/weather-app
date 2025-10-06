@@ -34,7 +34,7 @@ namespace DotnetWeatherBackend
         public double temperature { get; set; }
         public double windspeed { get; set; }
         public double winddirection { get; set; }
-        public string time { get; set; }
+        public string? time { get; set; }
         public int weathercode { get; set; }
     }
 
@@ -99,7 +99,7 @@ namespace DotnetWeatherBackend
                     : $"weather:{lat}:{lon}";
 
                 // Try to get weather data from cache
-                if (_cache.TryGetValue(weatherCacheKey, out ForecastResponse cachedForecast))
+                if (_cache.TryGetValue(weatherCacheKey, out ForecastResponse? cachedForecast))
                 {
                     return (cachedForecast, 200);
                 }
@@ -126,12 +126,12 @@ namespace DotnetWeatherBackend
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Network error fetching weather");
+                _logger.LogError(ex, "Network error fetching weather: {Message}", ex.Message);
                 return (new { error = $"Network error: {ex.Message}" }, 503);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error in WeatherService");
+                _logger.LogError(ex, "Unexpected error in WeatherService: {Message}", ex.Message);
                 return (new { error = $"Unexpected error: {ex.Message}" }, 500);
             }
         }

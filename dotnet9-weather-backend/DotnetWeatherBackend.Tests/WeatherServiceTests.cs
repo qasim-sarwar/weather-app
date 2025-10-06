@@ -133,7 +133,7 @@ public class WeatherServiceTests
 
         Assert.Equal(200, statusCode);
         var forecast = Assert.IsType<ForecastResponse>(result);
-        Assert.Equal(22, forecast.current_weather.temperature);
+        Assert.Equal(22, forecast.current_weather?.temperature);
     }
     [Fact]
     public async Task GetWeatherAsync_ReturnsServerError_WhenForecastServiceFails()
@@ -203,7 +203,7 @@ public class WeatherServiceTests
 
         Assert.Equal(200, statusCode);
         var forecast = Assert.IsType<ForecastResponse>(result);
-        Assert.Equal(22, forecast.current_weather.temperature);
+        Assert.Equal(22, forecast.current_weather?.temperature);
     }
 
     [Fact]
@@ -228,14 +228,14 @@ public class WeatherServiceTests
 
         // Manually add city to cache
         var cacheField = typeof(WeatherService).GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var cache = (IMemoryCache)cacheField.GetValue(service);
-        cache.Set("london", (51.5074, -0.1278), TimeSpan.FromMinutes(30));
+        var cache = (IMemoryCache?)cacheField?.GetValue(service);
+        cache?.Set("london", (51.5074, -0.1278), TimeSpan.FromMinutes(30));
 
         var (result, statusCode) = await service.GetWeatherAsync("London", null, null);
 
         Assert.Equal(200, statusCode);
         var forecast = Assert.IsType<ForecastResponse>(result);
-        Assert.Equal(30, forecast.current_weather.temperature);
+        Assert.Equal(30, forecast.current_weather?.temperature);
     }
     
     [Fact]
@@ -274,6 +274,6 @@ public class WeatherServiceTests
 
         Assert.Equal(200, statusCode);
         var forecast = Assert.IsType<ForecastResponse>(result);
-        Assert.Equal(25, forecast.current_weather.temperature);
+        Assert.Equal(25, forecast.current_weather?.temperature);
     }
 }
