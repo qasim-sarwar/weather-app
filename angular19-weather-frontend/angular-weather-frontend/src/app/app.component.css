@@ -244,12 +244,17 @@ p {
 }
 
 .weather-result {
-  margin-top: 1.2rem;
   padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  width: 100%;
+  border-radius: 24px;
+  border: 1px solid #dfe1e5;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
   max-width: 350px;
+  color: #000;
+}
+
+.weather-result h3 {
+  margin-top: 0rem;
+  margin-bottom: 0.5rem;
 }
 
 .weather-form-row {
@@ -280,6 +285,7 @@ p {
   margin: 0.3rem 0;
   font-size: 1rem;
   line-height: 1.2;
+  color: #000;
 }
 
 .error-msg {
