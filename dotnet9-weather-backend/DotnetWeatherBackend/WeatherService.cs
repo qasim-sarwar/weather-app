@@ -93,7 +93,6 @@ public class WeatherService
             return (new { error = $"Unexpected error: {ex.Message}" }, 500);
         }
     }
-
     private string DetectSevereWeather(int weatherCode)
     {
         return weatherCode switch
