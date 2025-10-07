@@ -45,7 +45,8 @@ export class AppComponent {
       next: (data) => (this.weather = data),
       error: (err) => {
         this.weather = null;
-        this.errorMsg = 'Error fetching weather data for city.';
+        console.log(err);
+        this.errorMsg = err.error?.error || 'Error fetching weather data by city.';
         console.error('Error fetching weather by city', err);
       }
     });
