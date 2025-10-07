@@ -85,7 +85,7 @@
     <p><strong>🕓 At:</strong> {{ weather.current_weather?.time | date:'medium' }}</p>
     <p><strong>💨 Windspeed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
     <p><strong>🧭 Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°</p>
-    <p>⚠️ <strong> {{ weather.eventForecast }} </strong></p>
+    <p>⚠️ <strong style="color:red"> {{ weather.eventForecast }} </strong></p>
   </div>
 
   <div class="weather-card" *ngIf="weather.maxTempTime && weather.maxTemp">
