@@ -8,26 +8,28 @@ using System.Net;
 using System.Text;
 
 public class WeatherServiceTests
-{    private static WeatherService CreateService(HttpMessageHandler handler)
+{
+    private static WeatherService CreateService(HttpMessageHandler handler)
     {
-        var client = new HttpClient(handler);
+        var client = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.open-meteo.com/")
+        };
 
-        // Mock IOptions<WeatherApiOptions>
+        var mockHttpClientFactory = new Mock<IHttpClientFactory>();
+        mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client);
+
         var options = Options.Create(new WeatherApiOptions
         {
             GeoUrl = "https://geocoding-api.open-meteo.com/v1/search",
             ForecastUrl = "https://api.open-meteo.com/v1/forecast"
         });
 
-        // Create IMemoryCache
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-
-        // Create mock ILogger<WeatherService>
         var mockLogger = new Mock<ILogger<WeatherService>>();
 
-        // Instantiate WeatherService with HttpClient (not IHttpClientFactory anymore)
         return new WeatherService(
-            client,
+            mockHttpClientFactory.Object,
             memoryCache,
             options,
             mockLogger.Object
@@ -105,7 +107,7 @@ public class WeatherServiceTests
 
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
-        // Geocoding call
+        // Geocoding
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("geocoding-api.open-meteo.com")),
@@ -116,7 +118,7 @@ public class WeatherServiceTests
                 Content = new StringContent(geoJson, Encoding.UTF8, "application/json")
             });
 
-        // Forecast call
+        // Forecast
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
@@ -135,15 +137,17 @@ public class WeatherServiceTests
         var forecast = Assert.IsType<ForecastResponse>(result);
         Assert.Equal(22, forecast.current_weather?.temperature);
     }
+
     [Fact]
     public async Task GetWeatherAsync_ReturnsServerError_WhenForecastServiceFails()
     {
         var geoJson = "{\"results\":[{\"latitude\":35.0,\"longitude\":139.0}]}";
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
+        // Geocoding success
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("geocoding-api.open-meteo.com")),
+                ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.ToString().Contains("geocoding-api.open-meteo.com")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -151,9 +155,10 @@ public class WeatherServiceTests
                 Content = new StringContent(geoJson, Encoding.UTF8, "application/json")
             });
 
+        // Forecast fails
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
+                ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -177,9 +182,10 @@ public class WeatherServiceTests
 
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
+        // Geocoding
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("geocoding-api.open-meteo.com")),
+                ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.ToString().Contains("geocoding-api.open-meteo.com")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -187,9 +193,10 @@ public class WeatherServiceTests
                 Content = new StringContent(geoJson, Encoding.UTF8, "application/json")
             });
 
+        // Forecast
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
+                ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -213,10 +220,10 @@ public class WeatherServiceTests
 
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
-        // Only forecast call should be setup
+        // Only forecast call
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
+                ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -226,7 +233,7 @@ public class WeatherServiceTests
 
         var service = CreateService(mockHandler.Object);
 
-        // Manually add city to cache
+        // Add to cache manually
         var cacheField = typeof(WeatherService).GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var cache = (IMemoryCache?)cacheField?.GetValue(service);
         cache?.Set("london", (51.5074, -0.1278), TimeSpan.FromMinutes(30));
@@ -237,7 +244,7 @@ public class WeatherServiceTests
         var forecast = Assert.IsType<ForecastResponse>(result);
         Assert.Equal(30, forecast.current_weather?.temperature);
     }
-    
+
     [Fact]
     public async Task GetWeatherAsync_CacheMiss_CallsGeocodingApi()
     {
@@ -246,10 +253,10 @@ public class WeatherServiceTests
 
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
-        // Geocoding call
+        // Geocoding
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("geocoding-api.open-meteo.com")),
+                ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.ToString().Contains("geocoding-api.open-meteo.com")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -257,10 +264,10 @@ public class WeatherServiceTests
                 Content = new StringContent(geoJson, Encoding.UTF8, "application/json")
             });
 
-        // Forecast call
+        // Forecast
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req => req.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
+                ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.ToString().Contains("api.open-meteo.com/v1/forecast")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {

@@ -1,136 +1,117 @@
 ﻿using Microsoft.AspNetCore.RateLimiting;
 using Polly;
 using Polly.Extensions.Http;
+using System.Net.Http;
 using System.Threading.RateLimiting;
+using DotnetWeatherBackend;
 
-namespace DotnetWeatherBackend
+var builder = WebApplication.CreateBuilder(args);
+
+//  Swagger 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+//  Authorization 
+builder.Services.AddAuthorization();
+
+//  Memory cache + WeatherService + Config 
+builder.Services.AddMemoryCache();
+builder.Services.Configure<WeatherApiOptions>(
+    builder.Configuration.GetSection("WeatherApiOptions"));
+builder.Services.AddScoped<WeatherService>();
+
+//  Polly policies for HttpClient Retry: up to 3 retries with exponential backoff (2s → 4s → 8s).
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() =>
+    HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .OrResult(msg => (int)msg.StatusCode == 429) // Too Many Requests
+        .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy() =>
+    HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+
+//  HttpClient with Polly policies 
+builder.Services.AddHttpClient("WeatherClient")
+    .AddPolicyHandler(GetRetryPolicy())
+    .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+//  Rate limiting 
+builder.Services.AddRateLimiter(options =>
 {
-    public class Program
+    options.AddFixedWindowLimiter("PerMinute", opt =>
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        opt.PermitLimit = 600;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
 
-            // Add Swagger support
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+    options.AddFixedWindowLimiter("PerHour", opt =>
+    {
+        opt.PermitLimit = 5000;
+        opt.Window = TimeSpan.FromHours(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
 
-            builder.Services.AddAuthorization();
+    options.AddFixedWindowLimiter("PerDay", opt =>
+    {
+        opt.PermitLimit = 10000;
+        opt.Window = TimeSpan.FromDays(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+});
 
-            // Register caching with options and WeatherService
-            builder.Services.AddMemoryCache();
-            builder.Services.Configure<WeatherApiOptions>(
-                builder.Configuration.GetSection("WeatherApiOptions"));
-            builder.Services.AddScoped<WeatherService>();
+//  CORS 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 
-            // Add rate limiting middleware
-            builder.Services.AddRateLimiter(options =>
-            {
-                options.AddFixedWindowLimiter("PerMinute", opt =>
-                {
-                    opt.PermitLimit = 600;
-                    opt.Window = TimeSpan.FromMinutes(1);
-                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    opt.QueueLimit = 0;
-                });
+builder.Services.AddOpenApi();
 
-                options.AddFixedWindowLimiter("PerHour", opt =>
-                {
-                    opt.PermitLimit = 5000;
-                    opt.Window = TimeSpan.FromHours(1);
-                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    opt.QueueLimit = 0;
-                });
+var app = builder.Build();
 
-                options.AddFixedWindowLimiter("PerDay", opt =>
-                {
-                    opt.PermitLimit = 10000;
-                    opt.Window = TimeSpan.FromDays(1);
-                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    opt.QueueLimit = 0;
-                });
-            });
-
-            // Add HttpClient with Polly policies
-            builder.Services.AddHttpClient("WeatherClient")
-                .AddPolicyHandler(GetRetryPolicy())
-                .AddPolicyHandler(GetCircuitBreakerPolicy());
-
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAngular", policy =>
-                    policy.WithOrigins("http://localhost:4200")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
-            });
-
-            builder.Services.AddOpenApi();
-
-            var app = builder.Build();
-
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseCors("AllowAngular");
-            app.UseAuthorization();
-
-            // Enable global rate limiting
-            app.UseRateLimiter();
-
-            // Match Angular service params (lat, lon, city)
-            app.MapGet("/api/weather", async (string? city, double? lat, double? lon, WeatherService weatherService) =>
-            {
-                var (result, statusCode) = await weatherService.GetWeatherAsync(city, lat, lon);
-
-                return statusCode switch
-                {
-                    200 => Results.Ok(result),
-                    400 => Results.BadRequest(result),
-                    404 => Results.NotFound(result),
-                    _ => Results.Problem(result?.ToString())
-                };
-            })
-            .WithName("GetWeather")
-            .RequireRateLimiting("PerMinute")
-            .RequireRateLimiting("PerHour")
-            .RequireRateLimiting("PerDay");
-
-            app.Run();
-        }
-
-        // Retry: up to 3 retries with exponential backoff (2s → 4s → 8s).
-        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .WaitAndRetryAsync(
-                    retryCount: 3,
-                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)), // 2s, 4s, 8s
-                    onRetry: (outcome, timespan, retryAttempt, context) =>
-                    {
-                        Console.WriteLine($"Retry {retryAttempt} after {timespan.TotalSeconds}s: {outcome.Exception?.Message ?? outcome.Result.StatusCode.ToString()}");
-                    });
-        }
-
-        private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .CircuitBreakerAsync(
-                    handledEventsAllowedBeforeBreaking: 5,
-                    durationOfBreak: TimeSpan.FromSeconds(30),
-                    onBreak: (outcome, breakDelay) =>
-                    {
-                        Console.WriteLine($"Circuit opened for {breakDelay.TotalSeconds}s: {outcome.Exception?.Message ?? outcome.Result.StatusCode.ToString()}");
-                    },
-                    onReset: () => Console.WriteLine("Circuit closed, requests flowing again."),
-                    onHalfOpen: () => Console.WriteLine("Circuit half-open, testing the waters.")
-                );
-        }
-    }
+//  Development environment setup 
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+//  Middleware pipeline 
+app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
+app.UseAuthorization();
+app.UseRateLimiter();
+
+//  Weather API Endpoint 
+app.MapGet("/api/weather", async (
+    string? city,
+    double? lat,
+    double? lon,
+    WeatherService weatherService) =>
+{
+    var (result, statusCode) = await weatherService.GetWeatherAsync(city, lat, lon);
+
+    return statusCode switch
+    {
+        200 => Results.Ok(result),
+        400 => Results.BadRequest(result),
+        404 => Results.NotFound(result),
+        _ => Results.Problem(result?.ToString())
+    };
+})
+.WithName("GetWeather")
+.RequireRateLimiting("PerMinute")
+.RequireRateLimiting("PerHour")
+.RequireRateLimiting("PerDay");
+
+app.Run();
