@@ -1,12 +1,12 @@
 <main class="main">
   <div class="content">
     <h1>Angular 19 Weather App</h1>
-    <h2 class="subtitle">
-      Fetch Live Weather Data
-    </h2>
+    <h2 class="subtitle">Fetch Live Weather Data</h2>
 
+    <!-- Weather Form Section -->
     <div class="weather-form-row">
-      <!-- City Search -->
+
+      <!-- City Search Form -->
       <div class="weather-form-section">
         <form #cityForm="ngForm" (ngSubmit)="fetchWeatherByCity()" autocomplete="off">
           <div class="input-row">
@@ -22,10 +22,12 @@
               (keydown.enter)="fetchWeatherByCity()"
             />
           </div>
+
           <div *ngIf="cityInput.invalid && cityInput.errors?.['pattern'] && (cityInput.dirty || cityInput.touched)" class="error-msg">
             Only letters, spaces, and hyphens are allowed.
           </div>
-          <button [disabled]="cityInput.invalid" class="weather-btn">
+
+          <button type="submit" [disabled]="cityInput.invalid" class="weather-btn">
             Fetch by City
           </button>
         </form>
@@ -33,7 +35,7 @@
 
       <div class="weather-divider"></div>
 
-      <!-- Lat / Lon Search -->
+      <!-- Latitude / Longitude Search -->
       <div class="weather-form-section">
         <div class="input-row">
           <input
@@ -57,26 +59,51 @@
           Fetch by Latitude/Longitude
         </button>
       </div>
+
     </div>
 
+    <!-- Error Message -->
     <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
 
+    <!-- Weather Result -->
     <div *ngIf="weather" class="weather-result">
-      <h3>
-        Current Weather of
-        <span *ngIf="weather.city">{{ weather.city }}</span>
-        <span *ngIf="!weather.city">
-          ({{ weather.latitude }}, {{ weather.longitude }})
-        </span>
-      </h3>
-      <p><strong>🌍 Latitude:</strong> {{ weather.latitude }}</p>
-      <p><strong>🌏 Longitude:</strong> {{ weather.longitude }}</p>
-      <p><strong>🌡️ Temperature:</strong> {{ weather.current_weather?.temperature }} °C</p>
-      <p><strong>💨 Windspeed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
-      <p><strong>🧭 Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°</p>
-      <p><strong>⏰ Time:</strong> {{ weather.current_weather?.time | date:'medium' }}</p>
-      <p><strong>🌦️ Weather Code:</strong> {{ weather.current_weather?.weathercode }}</p>
+    <h3>
+      Current Weather of
+      <span *ngIf="weather.city">{{ weather.city }}</span>
+      <span *ngIf="!weather.city">({{ weather.latitude }}, {{ weather.longitude }})</span>
+    </h3>
+
+
+<div class="card-container">
+  <div class="weather-card" *ngIf="weather.minTempTime && weather.minTemp">
+    <h4>🌡️ Min Temperature {{ weather.minTemp }} °C</h4>
+    <p><strong>🕓 At: </strong> {{ weather.minTempTime | date:'shortTime' }}</p>
+  </div>
+
+  <div class="weather-card" *ngIf="weather.current_weather?.temperature">
+    <h4>☀️ Current Weather {{ weather.current_weather?.temperature }} °C</h4>
+    <p><strong>💨 Windspeed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
+    <p><strong>🧭 Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°</p>
+    <p><strong>⏰ At:</strong> {{ weather.current_weather?.time | date:'medium' }}</p>
+    <p>⚠️ <strong> {{ weather.eventForecast }} </strong></p>
+  </div>
+
+  <div class="weather-card" *ngIf="weather.maxTempTime && weather.maxTemp">
+    <h4>🔥 Max Temperature {{ weather.maxTemp }} °C</h4>
+    <p><strong>At: </strong> {{ weather.maxTempTime | date:'shortTime' }}</p>
+  </div>
+</div>
+  
+
+      <!-- Forecasted Events -->
+      <div *ngIf="events.length > 0" class="event-section">
+        <h4>🌦️ Forecasted Events</h4>
+        <ul>
+          <li *ngFor="let event of events">{{ event }}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </main>
-<router-outlet />
+
+<router-outlet></router-outlet>

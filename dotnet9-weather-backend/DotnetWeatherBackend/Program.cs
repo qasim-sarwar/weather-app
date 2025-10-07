@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
+﻿using DotnetWeatherBackend;
+using Microsoft.AspNetCore.RateLimiting;
 using Polly;
 using Polly.Extensions.Http;
-using System.Net.Http;
 using System.Threading.RateLimiting;
-using DotnetWeatherBackend;
 
 var builder = WebApplication.CreateBuilder(args);
 

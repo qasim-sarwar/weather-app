@@ -9,6 +9,9 @@ export class WeatherService {
   private apiUrl = 'https://localhost:3000/api/weather';
   
   constructor(private http: HttpClient) {}
+  getCityName(lat: number, lon: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}?lat=${lat}&lon=${lon}&limit=1`);
+  }
   getWeather(city?: string, lat?: number, lon?: number): Observable<any> {
     if (city) {
       return this.http.get(`${this.apiUrl}?city=${city}`);
