@@ -50,7 +50,7 @@ public class WeatherService
                 return (new { error = "Either city or lat/lon must be provided" }, 400);
 
             string cacheKey = city != null ? $"weather:{city}" : $"weather:{lat}:{lon}";
-            if (_cache.TryGetValue(cacheKey, out WeatherForecast cachedForecast))
+            if (_cache.TryGetValue(cacheKey, out WeatherForecast? cachedForecast))
                 return (cachedForecast, 200);
 
             var forecastUrl =

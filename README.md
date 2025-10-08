@@ -81,11 +81,12 @@ npm install
 node server.js
 
 
-The backend will run at:
+The backend for Node.js will run at:
 👉 http://localhost:3000/api/weather
 
 3. .NET Backend (Minimal API)
-
+The backend for Node.js will run at:
+👉 https://localhost:5000/api/weather
 A .NET 8 Minimal API alternative backend that returns weather forecast data.
 
 Setup & Run
@@ -95,16 +96,19 @@ dotnet run
 
 
 The backend will run at:
-👉 http://localhost:3000/api/weather
+👉 https://localhost:5000/api/weather
 
-(Port is set to 3000 to align with the Angular frontend service expectations.)
+(Port is set to 5000 to align with the Angular frontend service expectations.)
 
 4. Choosing a Backend
 
 The Angular frontend is preconfigured to call:
 
+For Node.js
 http://localhost:3000/api/weather
 
+for Dotnet
+https://localhost:5000/api/weather
 
 So you can run either the Node backend or the .NET backend, depending on preference.
 

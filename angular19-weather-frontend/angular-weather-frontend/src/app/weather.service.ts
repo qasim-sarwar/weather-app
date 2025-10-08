@@ -1,23 +1,41 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WeatherService {
-  private apiUrl = 'https://localhost:3000/api/weather';
-  
-  constructor(private http: HttpClient) {}
-  getCityName(lat: number, lon: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}?lat=${lat}&lon=${lon}&limit=1`);
+  constructor(
+    private http: HttpClient,
+    @Inject('API_CONFIG') private config: any
+  ) {}
+
+  getWeather(city?: string, lat?: number, lon?: number) {
+    const params = city
+      ? `?city=${encodeURIComponent(city)}`
+      : `?lat=${lat}&lon=${lon}`;
+
+    const nodeUrl = `${this.config.nodeBaseUrl}/weather${params}`;
+    const dotnetUrl = `${this.config.dotnetBaseUrl}/weather${params}`;
+
+    return this.http.get(nodeUrl).pipe(
+      catchError(err => {
+        console.warn('Node backend failed, falling back to .NET:', err.message);
+        return this.http.get(dotnetUrl);
+      })
+    );
   }
-  getWeather(city?: string, lat?: number, lon?: number): Observable<any> {
-    if (city) {
-      return this.http.get(`${this.apiUrl}?city=${city}`);
-    }
-    const latitude = lat;
-    const longitude = lon;
-    return this.http.get(`${this.apiUrl}?lat=${latitude}&lon=${longitude}`);
+
+  getCityName(lat: number, lon: number) {
+    const nodeUrl = `${this.config.nodeBaseUrl}/city?lat=${lat}&lon=${lon}`;
+    const dotnetUrl = `${this.config.dotnetBaseUrl}/city?lat=${lat}&lon=${lon}`;
+
+    return this.http.get(nodeUrl).pipe(
+      catchError(err => {
+        console.warn('Node backend failed for city lookup, using .NET fallback');
+        return this.http.get(dotnetUrl);
+      })
+    );
   }
 }

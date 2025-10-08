@@ -10,6 +10,15 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
-    importProvidersFrom(FormsModule)
+    importProvidersFrom(FormsModule),
+
+    // Global backend API config
+    {
+      provide: 'API_CONFIG',
+      useValue: {
+        nodeBaseUrl: 'http://localhost:3000/api',
+        dotnetBaseUrl: 'https://localhost:5000/api'
+      }
+    }
   ]
 };

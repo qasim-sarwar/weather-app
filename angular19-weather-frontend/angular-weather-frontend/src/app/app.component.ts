@@ -82,15 +82,18 @@ export class AppComponent {
     });
   }
 
-  /** Fetch city name based on lat/lon */
   private fetchCityName(lat: number, lon: number): void {
-    this.weatherService.getCityName(lat, lon).subscribe({
-      next: res => {
-        if (res && res.length > 0) this.city = res[0].name;
-      },
-      error: err => console.error('Error fetching city name:', err)
-    });
-  }
+  this.weatherService.getCityName(lat, lon).subscribe({
+    next: (res: any) => {
+      if (Array.isArray(res) && res.length > 0) {
+        this.city = res[0].name;
+      } else if (res?.name) {
+        this.city = res.name;
+      }
+    },
+    error: err => console.error('Error fetching city name:', err)
+  });
+}
 
   /** Validate city input */
   private validateCity(): boolean {
