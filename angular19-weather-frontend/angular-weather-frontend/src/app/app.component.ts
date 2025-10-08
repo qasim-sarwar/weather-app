@@ -19,28 +19,20 @@ export class AppComponent {
 
   weather: any = null;
   errorMsg: string = '';
-
-  minTemp: number | null = null;
-  maxTemp: number | null = null;
-  currentTemp: number | null = null;
   events: string[] = [];
+
+  isLoading = false;
 
   constructor(private weatherService: WeatherService) {}
 
-  /** Extracts relevant weather details and updates component state */
   private extractWeatherDetails(data: any): void {
     this.weather = data;
-    this.currentTemp = data.current_weather?.temperature ?? null;
-    this.minTemp = data.daily?.temperature_2m_min?.[0] ?? null;
-    this.maxTemp = data.daily?.temperature_2m_max?.[0] ?? null;
     this.events = this.getWeatherEvents(data.daily?.weathercode ?? []);
   }
 
-  /** Maps weather codes to human-readable events */
   private getWeatherEvents(codes: number[]): string[] {
     const codeEventMap: Record<number, string> = {
-      0: '☀️ Clear Sky',
-      2: '💨 Windy', 3: '💨 Windy',
+      0: '☀️ Clear Sky', 2: '💨 Windy', 3: '💨 Windy',
       45: '🌫️ Dense Fog', 48: '🌫️ Dense Fog',
       51: '🌧️ Rain', 61: '🌧️ Rain', 63: '🌧️ Rain',
       72: '🌨️ Snowfall', 77: '🌨️ Snowfall',
@@ -51,20 +43,19 @@ export class AppComponent {
     return [...new Set(codes.map(code => codeEventMap[code]).filter(Boolean))];
   }
 
-  /** Fetch weather by city name */
   fetchWeatherByCity(): void {
     this.resetCoordinates();
-
     if (!this.validateCity()) return;
 
     this.errorMsg = '';
+    this.isLoading = true;
+
     this.weatherService.getWeather(this.city).subscribe({
-      next: data => this.extractWeatherDetails(data),
-      error: err => this.handleError(err, 'Error fetching weather data by city.')
+      next: data => { this.extractWeatherDetails(data); this.isLoading = false; },
+      error: err => { this.handleError(err, 'Error fetching weather data by city.'); this.isLoading = false; }
     });
   }
 
-  /** Fetch weather by latitude and longitude */
   fetchWeatherByLatLon(): void {
     this.city = '';
     if (!this.latitude || !this.longitude) {
@@ -73,29 +64,31 @@ export class AppComponent {
     }
 
     this.errorMsg = '';
+    this.isLoading = true;
+
     this.weatherService.getWeather(undefined, this.latitude, this.longitude).subscribe({
       next: data => {
         this.extractWeatherDetails(data);
         this.fetchCityName(this.latitude!, this.longitude!);
+        this.isLoading = false;
       },
-      error: err => this.handleError(err, 'Error fetching weather data by coordinates.')
+      error: err => { this.handleError(err, 'Error fetching weather data by coordinates.'); this.isLoading = false; }
     });
   }
 
   private fetchCityName(lat: number, lon: number): void {
-  this.weatherService.getCityName(lat, lon).subscribe({
-    next: (res: any) => {
-      if (Array.isArray(res) && res.length > 0) {
-        this.city = res[0].name;
-      } else if (res?.name) {
-        this.city = res.name;
-      }
-    },
-    error: err => console.error('Error fetching city name:', err)
-  });
-}
+    this.weatherService.getCityName(lat, lon).subscribe({
+      next: (res: any) => {
+        if (Array.isArray(res) && res.length > 0) {
+          this.city = res[0].name;
+        } else if (res?.name) {
+          this.city = res.name;
+        }
+      },
+      error: err => console.error('Error fetching city name:', err)
+    });
+  }
 
-  /** Validate city input */
   private validateCity(): boolean {
     if (!this.city?.trim()) {
       this.setError('Please enter a valid city name.');
@@ -108,21 +101,19 @@ export class AppComponent {
     return true;
   }
 
-  /** Reset coordinates */
   private resetCoordinates(): void {
     this.latitude = null;
     this.longitude = null;
   }
 
-  /** Set error state */
   private setError(message: string): void {
     this.weather = null;
     this.errorMsg = message;
   }
 
-  /** Handle HTTP errors */
   private handleError(err: any, defaultMsg: string): void {
     this.weather = null;
     this.errorMsg = err?.error?.error || defaultMsg;
+    this.isLoading = false;
   }
 }
