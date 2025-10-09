@@ -201,4 +201,58 @@ public class WeatherServiceTests
         var (result, statusCode) = await service.GetWeatherAsync("London", null, null);
         Assert.Equal(200, statusCode);
     }
+
+    [Fact]
+    public async Task GetWeatherAsync_CacheHit_ReturnsCachedForecastWithoutApiCall()
+    {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict); // no API call expected
+        var service = CreateService(mockHandler.Object);
+
+        var forecast = new WeatherForecast
+        {
+            current_weather = new CurrentWeather { temperature = 25 },
+            MinTemp = 20,
+            MaxTemp = 30
+        };
+
+        var cacheField = typeof(WeatherService).GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var cache = (IMemoryCache)cacheField!.GetValue(service)!;
+
+        cache.Set("weather:35:139", forecast, TimeSpan.FromMinutes(10));
+
+        var (result, statusCode) = await service.GetWeatherAsync(null, 35, 139);
+
+        Assert.Equal(200, statusCode);
+        Assert.Same(forecast, result); // same instance from cache
+    }
+
+    [Fact]
+    public async Task GetWeatherAsync_CacheMiss_FetchesForecastAndStoresInCache()
+    {
+        var forecastJson = "{\"current_weather\":{\"temperature\":18},\"hourly\":{\"temperature_2m\":[15,18],\"time\":[\"2025-10-09T10:00\",\"2025-10-09T11:00\"]}}";
+
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(forecastJson, Encoding.UTF8, "application/json")
+            });
+
+        var service = CreateService(mockHandler.Object);
+
+        var cacheField = typeof(WeatherService).GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var cache = (IMemoryCache)cacheField!.GetValue(service)!;
+
+        Assert.False(cache.TryGetValue("weather:35:139", out _)); // ensure cache miss
+
+        var (result, statusCode) = await service.GetWeatherAsync(null, 35, 139);
+
+        Assert.Equal(200, statusCode);
+        Assert.IsType<WeatherForecast>(result);
+        Assert.True(cache.TryGetValue("weather:35:139", out _)); // now cached
+    }
 }
