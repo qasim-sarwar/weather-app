@@ -1,8 +1,8 @@
 ﻿using DotnetWeatherBackend;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System.Net.Http.Json;
 using System.Globalization;
+using System.Text.Json;
 
 public class WeatherService
 {
@@ -58,7 +58,7 @@ public class WeatherService
             }
 
             // Cache key for weather payload
-            string cacheKey = city != null ? $"weather:{city}" : $"weather:{lat}:{lon}";
+            string cacheKey = city != null ? $"{city}" : $"{lat},{lon}";
 
             if (_cache.TryGetValue<WeatherForecast>(cacheKey, out var cachedForecast) && cachedForecast != null)
             {
@@ -73,7 +73,7 @@ public class WeatherService
             if (forecast == null)
                 return (new { error = "Forecast API returned null" }, 500);
 
-            // --- compute Min/Max and times for *today* using hourly data ---
+            // compute Min/Max and times for today using hourly data
             try
             {
                 var offsetSeconds = forecast.utc_offset_seconds ?? 0;
@@ -144,6 +144,8 @@ public class WeatherService
                     var curDt = DateTime.Parse(forecast.current_weather.time, CultureInfo.InvariantCulture, DateTimeStyles.None);
                     var curDto = new DateTimeOffset(curDt, offset);
                     forecast.current_weather.time = curDto.ToString("o");
+                    forecast.DayName = DateTime.UtcNow.DayOfWeek.ToString();
+                    forecast.City = await GetCityNameFromApi(lat, lon);
                 }
             }
             catch (Exception ex)
@@ -153,7 +155,7 @@ public class WeatherService
             }
 
             // Event detection (existing logic)
-            forecast.EventForecast = DetectSevereWeather(forecast.current_weather?.weathercode ?? 0);
+            forecast.EventForecast = DetectSevereWeather(forecast.current_weather?.weathercode ?? 0, forecast.current_weather?.temperature, forecast.MaxTemp);
 
             // Cache and return
             _cache.Set(cacheKey, forecast, TimeSpan.FromMinutes(10));
@@ -171,18 +173,126 @@ public class WeatherService
         }
     }
 
-    private string DetectSevereWeather(int weatherCode)
+    private string DetectSevereWeather(int weatherCode, double? currentTemp, double? maxTemp)
     {
-        return weatherCode switch
+        var parts = new List<string>();
+
+        // Map WMO weather codes to friendly labels
+        var codeLabel = weatherCode switch
         {
-            95 or 96 or 99 => "Thunderstorm expected ⛈️",
-            71 or 73 or 75 or 77 => "Blizzard conditions ❄️",
-            45 or 48 => "Dense fog 🌫️",
-            51 or 53 or 55 => "Light drizzle 🌦️",
-            61 or 63 or 65 => "Rain showers 🌧️",
-            80 or 81 or 82 => "Heavy rain showers ⛈",
-            85 or 86 => "Snow showers 🌨️",
-            _ => "Clear or mild weather ☀️"
+            0 => "Clear sky ☀️",
+            1 => "Mainly clear 🌤️",
+            2 => "Partly cloudy ⛅",
+            3 => "Overcast ☁️",
+            45 => "Fog 🌫️",
+            48 => "Rime fog 🌫️",
+            51 => "Light drizzle 🌦️",
+            53 => "Moderate drizzle 🌧️",
+            55 => "Dense drizzle 🌧️",
+            61 => "Slight rain 🌧️",
+            63 => "Moderate rain 🌧️",
+            65 => "Heavy rain 🌧️",
+            71 => "Slight snow 🌨️",
+            73 => "Moderate snow 🌨️",
+            75 => "Heavy snow ❄️",
+            77 => "Snow grains ❄️",
+            80 => "Rain showers 🌦️",
+            81 => "Heavy rain showers 🌧️",
+            82 => "Violent rain showers ⛈️",
+            85 => "Snow showers 🌨️",
+            86 => "Heavy snow showers ❄️",
+            95 => "Thunderstorm ⛈️",
+            96 => "Thunderstorm with hail ⛈️",
+            99 => "Severe thunderstorm ⛈️",
+            _ => $"Code {weatherCode}"
         };
+
+        parts.Add(codeLabel);
+
+        // Temperature-based alerts (cold first, then heat)
+        if (currentTemp.HasValue)
+        {
+            if (currentTemp <= -40)
+                parts.Add("Extreme polar cold ❄️❄️");
+            else if (currentTemp <= -30)
+                parts.Add("Extreme cold ❄️");
+            else if (currentTemp <= -20)
+                parts.Add("Severe cold ⚠️");
+            else if (currentTemp <= -5)
+                parts.Add("Very cold 🥶");
+            else if (currentTemp <= 0)
+                parts.Add("Freezing ❄️");
+        }
+
+        if (maxTemp.HasValue)
+        {
+            if (maxTemp >= 42)
+                parts.Add("Extreme heat 🔥🔥");
+            else if (maxTemp >= 38)
+                parts.Add("Severe heat 🔥");
+            else if (maxTemp >= 35)
+                parts.Add("Heatwave 🔥");
+        }
+
+        // Include a short "severity summary" if thunderstorm / blizzard etc.
+        if (new[] { 95, 96, 99 }.Contains(weatherCode))
+            parts.Add("Severe storm risk ⚡");
+        if (new[] { 71, 73, 75, 77 }.Contains(weatherCode))
+            parts.Add("Blizzard risk ❄️");
+        if (new[] { 81, 82, 63, 65 }.Contains(weatherCode))
+            parts.Add("Heavy precipitation / flood risk 🌧️");
+
+        // Deduplicate and return
+        var result = string.Join(" ", parts.Distinct());
+        return result;
+    }
+    public async Task<string> GetCityNameFromApi(double? lat, double? lon)
+    {
+        if (lat == null || lon == null)
+            return "Invalid coordinates.";
+
+        string apiUrl = $"{_options.CityBaseUrl}?format=json&lat={lat}&lon={lon}";
+
+        try
+        {
+            // Required by Nominatim to prevent 403 responses
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("DotnetWeatherBackend/1.0 (contact@example.com)");
+
+            var response = await _httpClient.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var data = JsonSerializer.Deserialize<NominatimResponse>(json, options);
+
+            // Try city, then town, then village
+            string? cityName = data?.Address?.City ??
+                               data?.Address?.Town ??
+                               data?.Address?.Village ??
+                               data?.Address?.State;
+
+            return !string.IsNullOrEmpty(cityName) ? cityName : $"{lat},{lon}";
+            ;
+        }
+        catch (HttpRequestException e)
+        {
+            _logger.LogError(e, "Error calling Nominatim API for city name lookup");
+            return "City lookup failed (network error).";
+        }
+        catch (JsonException e)
+        {
+            _logger.LogError(e, "Error parsing Nominatim API response");
+            return "City lookup failed (invalid response).";
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unexpected error in GetCityNameFromApi");
+            return "City lookup failed (unexpected error).";
+        }
     }
 }

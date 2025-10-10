@@ -1,4 +1,6 @@
-﻿namespace DotnetWeatherBackend
+﻿using System.Text.Json.Serialization;
+
+namespace DotnetWeatherBackend
 {
     public class WeatherApiOptions
     {
@@ -6,6 +8,7 @@
         public string GeoEndpoint { get; set; } = "geocoding";
         public string ForecastEndpoint { get; set; } = "forecast";
         public object GeoUrl { get; set; } = "https://geocoding-api.open-meteo.com/v1/search";
+        public string CityBaseUrl { get; set; } = "https://nominatim.openstreetmap.org/reverse";
     }
     public class WeatherForecast
     {
@@ -26,6 +29,8 @@
         public string? MinTempTime { get; set; }    // ISO8601 with offset
         public string? MaxTempTime { get; set; }    // ISO8601 with offset
         public string? EventForecast { get; set; }
+        public string? DayName { get; set; }
+        public string? City { get; set; }
     }
 
     public class CurrentWeather
@@ -59,5 +64,24 @@
     {
         public double latitude { get; set; }
         public double longitude { get; set; }
+    }
+
+    // Represents the root of the JSON response
+    public class NominatimResponse
+    {
+        // The [JsonPropertyName("address")] attribute maps the JSON key 'address' to the C# property 'Address'
+        [JsonPropertyName("address")]
+        public Address? Address { get; set; }
+    }
+
+    // Represents the nested 'address' object
+    public class Address
+    {
+        // The [JsonPropertyName("city")] attribute maps the JSON key 'city' to the C# property 'City'
+        [JsonPropertyName("city")]
+        public string? City { get; set; }
+        public string? Town { get; internal set; }
+        public string? Village { get; internal set; }
+        public string? State { get; internal set; }
     }
 }
