@@ -22,50 +22,43 @@ public class WeatherService
         _options = options.Value;
         _logger = logger;
     }
-
     public async Task<(object result, int statusCode)> GetWeatherAsync(string? city, double? lat, double? lon)
     {
         try
         {
-            // Resolve city -> lat/lon (with cache)
+            // city -> coords (existing logic)...
             if (!string.IsNullOrWhiteSpace(city))
             {
                 city = city.Trim().ToLowerInvariant();
-
                 if (!_cache.TryGetValue<(double lat, double lon)>(city, out var coords))
                 {
                     var geoUrl = $"{_options.GeoUrl}?name={city}&count=1";
                     var geoResponse = await _httpClient.GetFromJsonAsync<GeoResponse>(geoUrl);
-
-                    if (geoResponse?.results == null || geoResponse.results.Count == 0)
+                    if (geoResponse?.Results == null || geoResponse.Results.Count == 0)
                     {
                         _logger.LogWarning("City not found: {City}", city);
                         return (new { error = "City not found" }, 404);
                     }
-
-                    coords = (geoResponse.results[0].latitude, geoResponse.results[0].longitude);
+                    coords = (geoResponse.Results[0].Latitude, geoResponse.Results[0].Longitude);
                     _cache.Set(city, coords, TimeSpan.FromMinutes(30));
                 }
-
                 lat = coords.lat;
                 lon = coords.lon;
             }
 
-            // Validate input
             if (lat == null || lon == null)
-            {
                 return (new { error = "Either city or lat/lon must be provided" }, 400);
-            }
 
-            // Cache key for weather payload
-            string cacheKey = city != null ? $"{city}" : $"{lat},{lon}";
+            // cache key (keep consistent)
+            string cacheKey = city != null ? $"weather:{city}" : $"weather:{lat}:{lon}";
 
+            // Return from cache immediately if present
             if (_cache.TryGetValue<WeatherForecast>(cacheKey, out var cachedForecast) && cachedForecast != null)
             {
                 return (cachedForecast, 200);
             }
 
-            // Request hourly + daily + current (timezone=auto to get utc_offset_seconds)
+            // Request hourly including weathercode now (so we can build per-hour events)
             var forecastUrl =
                 $"{_options.BaseUrl}/{_options.ForecastEndpoint}?latitude={lat}&longitude={lon}&hourly=temperature_2m&daily=temperature_2m_min,temperature_2m_max,weathercode&current_weather=true&timezone=auto";
 
@@ -73,91 +66,121 @@ public class WeatherService
             if (forecast == null)
                 return (new { error = "Forecast API returned null" }, 500);
 
-            // compute Min/Max and times for today using hourly data
+            // Compute offset
+            var offsetSeconds = forecast.UtcOffsetSeconds ?? 0;
+            var offset = TimeSpan.FromSeconds(offsetSeconds);
+
+            // Build todayEntries from hourly arrays
+            var todayEntries = new List<HourlyEntry>();
             try
             {
-                var offsetSeconds = forecast.utc_offset_seconds ?? 0;
-                var offset = TimeSpan.FromSeconds(offsetSeconds);
+                var hourlyTemps = forecast.Hourly?.Temperature2m;
+                var hourlyTimes = forecast.Hourly?.Time;
+                var hourlyCodes = forecast.Hourly?.WeatherCode; // might be null if not returned
 
-                // today's date string from daily.time[0] (Open-Meteo convention)
-                string? todayDate = forecast.daily?.time?.FirstOrDefault(); // e.g. "2025-10-09"
+                // Get today's date string from daily.time[0] if available
+                string? todayDate = forecast.Daily?.Time?.FirstOrDefault(); // e.g. "2025-10-09"
 
-                var hourlyTemps = forecast.hourly?.temperature_2m;
-                var hourlyTimes = forecast.hourly?.time;
-
-                var todayEntries = new List<(double temp, string time)>();
-
-                if (!string.IsNullOrEmpty(todayDate) && hourlyTemps != null && hourlyTimes != null)
+                if (hourlyTemps != null && hourlyTimes != null)
                 {
                     int len = Math.Min(hourlyTemps.Count, hourlyTimes.Count);
                     for (int i = 0; i < len; i++)
                     {
                         var t = hourlyTimes[i];
-                        if (!string.IsNullOrEmpty(t) && t.StartsWith(todayDate, StringComparison.Ordinal))
+                        if (!string.IsNullOrEmpty(t))
                         {
-                            todayEntries.Add((hourlyTemps[i], t));
+                            // select only entries for today's date (or fallback later)
+                            if (!string.IsNullOrEmpty(todayDate) && t.StartsWith(todayDate, StringComparison.Ordinal))
+                            {
+                                // parse time and attach offset so we can sort and format
+                                var parsed = DateTime.Parse(t, CultureInfo.InvariantCulture, DateTimeStyles.None);
+                                var dto = new DateTimeOffset(parsed, offset);
+
+                                var entry = new HourlyEntry
+                                {
+                                    TimeIso = dto.ToString("o"),
+                                    DisplayTime = dto.ToString("h:mm tt", CultureInfo.InvariantCulture),
+                                    Temperature = hourlyTemps[i],
+                                    WeatherCode = (hourlyCodes != null && hourlyCodes.Count > i) ? (int?)hourlyCodes[i] : null
+                                };
+                                entry.Event = DetectSevereWeather(entry.WeatherCode ?? 0, entry.Temperature);
+                                todayEntries.Add(entry);
+                            }
                         }
                     }
                 }
 
-                // Fallback: if no hour entries for today, take first 24 hours as best-effort
-                if (todayEntries.Count == 0 && hourlyTemps != null && hourlyTimes != null && hourlyTemps.Count > 0)
+                // fallback: if nothing matched today's date, take first 24 hours (best-effort)
+                if (todayEntries.Count == 0 && hourlyTemps != null && hourlyTimes != null)
                 {
                     int len = Math.Min(24, Math.Min(hourlyTemps.Count, hourlyTimes.Count));
                     for (int i = 0; i < len; i++)
-                        todayEntries.Add((hourlyTemps[i], hourlyTimes[i]));
+                    {
+                        var parsed = DateTime.Parse(hourlyTimes[i], CultureInfo.InvariantCulture, DateTimeStyles.None);
+                        var dto = new DateTimeOffset(parsed, offset);
 
+                        var entry = new HourlyEntry
+                        {
+                            TimeIso = dto.ToString("o"),
+                            DisplayTime = dto.ToString("h:mm tt", CultureInfo.InvariantCulture),
+                            Temperature = hourlyTemps[i],
+                            WeatherCode = (forecast.Hourly?.WeatherCode != null && forecast.Hourly.WeatherCode.Count > i) ? (int?)forecast.Hourly.WeatherCode[i] : null
+                        };
+                        entry.Event = DetectSevereWeather(entry.WeatherCode ?? 0, entry.Temperature);
+                        todayEntries.Add(entry);
+                    }
                     _logger.LogWarning("No hourly entries matched today's date; using first {Len} hours as fallback.", todayEntries.Count);
                 }
 
-                if (todayEntries.Count > 0)
+                // sort by local time ascending (AM -> PM)
+                todayEntries = todayEntries.OrderBy(e =>
                 {
-                    // compute min/max from today's entries
-                    var minEntry = todayEntries.Aggregate((a, b) => b.temp < a.temp ? b : a);
-                    var maxEntry = todayEntries.Aggregate((a, b) => b.temp > a.temp ? b : a);
+                    if (DateTimeOffset.TryParse(e.TimeIso, out var parsed)) return parsed;
+                    return DateTimeOffset.MinValue;
+                }).ToList();
 
-                    forecast.MinTemp = minEntry.temp;
-                    forecast.MaxTemp = maxEntry.temp;
-
-                    // Parse naive ISO strings and attach offset from API
-                    var minDt = DateTime.Parse(minEntry.time, CultureInfo.InvariantCulture, DateTimeStyles.None);
-                    var maxDt = DateTime.Parse(maxEntry.time, CultureInfo.InvariantCulture, DateTimeStyles.None);
-
-                    var minDto = new DateTimeOffset(minDt, offset);
-                    var maxDto = new DateTimeOffset(maxDt, offset);
-
-                    forecast.MinTempTime = minDto.ToString("o"); // ISO8601 with offset
-                    forecast.MaxTempTime = maxDto.ToString("o");
-                }
-                else
-                {
-                    // fallback to daily summary if hourly unavailable
-                    forecast.MinTemp = forecast.daily?.temperature_2m_min?.FirstOrDefault();
-                    forecast.MaxTemp = forecast.daily?.temperature_2m_max?.FirstOrDefault();
-                    forecast.MinTempTime = null;
-                    forecast.MaxTempTime = null;
-                }
-
-                // Normalize current_weather.time to include offset (if present)
-                if (forecast.current_weather != null && !string.IsNullOrEmpty(forecast.current_weather.time))
-                {
-                    var curDt = DateTime.Parse(forecast.current_weather.time, CultureInfo.InvariantCulture, DateTimeStyles.None);
-                    var curDto = new DateTimeOffset(curDt, offset);
-                    forecast.current_weather.time = curDto.ToString("o");
-                    forecast.DayName = DateTime.UtcNow.DayOfWeek.ToString();
-                    forecast.City = await GetCityNameFromApi(lat, lon);
-                }
+                forecast.TodayEntries = todayEntries;
             }
             catch (Exception ex)
             {
-                // don't fail the whole request if time parsing fails — log and continue
-                _logger.LogWarning(ex, "Failed to compute min/max times or normalize timezones. Returning raw times.");
+                _logger.LogWarning(ex, "Failed to build todayEntries.");
+                forecast.TodayEntries = new List<HourlyEntry>();
             }
 
-            // Event detection (existing logic)
-            forecast.EventForecast = DetectSevereWeather(forecast.current_weather?.weathercode ?? 0, forecast.current_weather?.temperature, forecast.MaxTemp);
+            // compute min/max/time as before (use todayEntries for min/max if present)
+            if (forecast.TodayEntries != null && forecast.TodayEntries.Count > 0)
+            {
+                var minEntry = forecast.TodayEntries.Aggregate((a, b) => b.Temperature < a.Temperature ? b : a);
+                var maxEntry = forecast.TodayEntries.Aggregate((a, b) => b.Temperature > a.Temperature ? b : a);
 
-            // Cache and return
+                forecast.MinTemp = minEntry.Temperature;
+                forecast.MaxTemp = maxEntry.Temperature;
+                forecast.MinTempTime = minEntry.TimeIso;
+                forecast.MaxTempTime = maxEntry.TimeIso;
+            }
+            else
+            {
+                forecast.MinTemp = forecast.Daily?.Temperature2mMin?.FirstOrDefault();
+                forecast.MaxTemp = forecast.Daily?.Temperature2mMax?.FirstOrDefault();
+            }
+
+            // normalize current weather time
+            if (forecast.CurrentWeather != null && !string.IsNullOrEmpty(forecast.CurrentWeather.Time))
+            {
+                var curDt = DateTime.Parse(forecast.CurrentWeather.Time, CultureInfo.InvariantCulture, DateTimeStyles.None);
+                var curDto = new DateTimeOffset(curDt, offset);
+                forecast.CurrentWeather.Time = curDto.ToString("o");
+                forecast.DayName = DateTime.UtcNow.DayOfWeek.ToString();
+                forecast.City = await GetCityNameFromApi(lat, lon);
+            }
+
+            // attach City (existing call)
+            forecast.City = await GetCityNameFromApi(lat, lon);
+
+            // Event detection
+            forecast.EventForecast = DetectSevereWeather(forecast.CurrentWeather?.WeatherCode ?? 0, forecast.MaxTemp);
+
+            // cache and return
             _cache.Set(cacheKey, forecast, TimeSpan.FromMinutes(10));
             return (forecast, 200);
         }
@@ -173,7 +196,7 @@ public class WeatherService
         }
     }
 
-    private string DetectSevereWeather(int weatherCode, double? currentTemp, double? maxTemp)
+    private string DetectSevereWeather(int weatherCode, double? currentTemp)
     {
         var parts = new List<string>();
 
@@ -222,15 +245,11 @@ public class WeatherService
                 parts.Add("Very cold 🥶");
             else if (currentTemp <= 0)
                 parts.Add("Freezing ❄️");
-        }
-
-        if (maxTemp.HasValue)
-        {
-            if (maxTemp >= 42)
+            else if (currentTemp >= 42)
                 parts.Add("Extreme heat 🔥🔥");
-            else if (maxTemp >= 38)
+            else if (currentTemp >= 38)
                 parts.Add("Severe heat 🔥");
-            else if (maxTemp >= 35)
+            else if (currentTemp >= 35)
                 parts.Add("Heatwave 🔥");
         }
 

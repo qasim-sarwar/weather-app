@@ -1,7 +1,6 @@
 <main class="main">
   <div class="content">
-    <h1>Made with Angular 19 🌦️</h1>
-    <h2 class="subtitle">Search Todays Live Weather</h2>
+    <h2 class="subtitle">Search Todays Live Weather Forecast🌦️</h2>
 
     <!-- Weather Form Section -->
     <div class="weather-form-row">
@@ -84,8 +83,14 @@
           <h4>☀️ Current Weather {{ weather.current_weather?.temperature }} °C</h4>
           <p><strong>🕓 At:</strong> {{ weather.current_weather?.time | date:'medium' }}</p>
           <p><strong>⚠️ {{ weather.eventForecast }} </strong></p>
-          <p><strong>💨 Windspeed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
+          <p><strong>💨 Wind speed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
           <p><strong>🧭 Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°</p>
+                <div *ngIf="events.length > 0" class="event-section">
+        <h4>🌦️ Forecasted Events</h4>
+        <ul>
+          <li *ngFor="let event of events">{{ event }}</li>
+        </ul>
+      </div>
         </div>
 
         <div class="weather-card" *ngIf="weather.maxTempTime && weather.maxTemp">
@@ -93,13 +98,17 @@
           <p><strong>🕓 At: </strong> {{ weather.maxTempTime | date:'shortTime' }}</p>
         </div>
       </div>
-
-      <div *ngIf="events.length > 0" class="event-section">
-        <h4>🌦️ Forecasted Events</h4>
-        <ul>
-          <li *ngFor="let event of events">{{ event }}</li>
-        </ul>
-      </div>
+      <!-- Hourly small cards -->
+<div *ngIf="weather?.todayEntries?.length">
+  <h4 style="text-align: center;">Today's Hourly Forecast 🌦️</h4>
+  <div class="hourly-cards-grid">
+    <div class="hour-card" *ngFor="let e of weather.todayEntries">
+      <div class="hour-top">🕓 {{ e.displayTime || (e.timeIso | date:'shortTime') }}</div>
+      <div class="hour-temp">🌡️ {{ e.temperature }} °C</div>
+      <div class="hour-event">⚠️ {{ e.event }}</div>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 </main>

@@ -19,7 +19,7 @@ public class WeatherServiceTests
         var options = Options.Create(new WeatherApiOptions
         {
             BaseUrl = "https://api.open-meteo.com/v1",
-            GeoEndpoint = "geocoding",
+            GeoUrl = "geocoding",
             ForecastEndpoint = "forecast"
         });
 
@@ -210,7 +210,7 @@ public class WeatherServiceTests
 
         var forecast = new WeatherForecast
         {
-            current_weather = new CurrentWeather { temperature = 25 },
+            CurrentWeather = new CurrentWeather { Temperature = 25 },
             MinTemp = 20,
             MaxTemp = 30
         };
