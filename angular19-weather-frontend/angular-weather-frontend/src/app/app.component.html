@@ -70,7 +70,7 @@
         Current Weather of
         <span *ngIf="weather.city">{{ weather.city }}</span>
         <span *ngIf="!weather.city">({{ weather.latitude }}, {{ weather.longitude }})</span>
-        <span>🕓 On: {{ weather.dayName }}</span>
+        <span>🕓On:{{ weather.dayName }}</span>
       </h3>
 
       <div class="card-container">
@@ -106,7 +106,7 @@
     <div class="hour-card" *ngFor="let e of weather.todayEntries">
       <div class="hour-top">🕓 {{ e.displayTime || (e.timeIso | date:'shortTime') }}</div>
       <div class="hour-temp">🌡️ {{ e.temperature }} °C</div>
-      <div class="hour-event">⚠️ {{ e.event }}</div>
+      <div class="hour-event"> {{ e.event }}</div>
     </div>
   </div>
 </div>
