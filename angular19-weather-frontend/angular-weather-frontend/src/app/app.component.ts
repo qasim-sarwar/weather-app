@@ -27,20 +27,7 @@ export class AppComponent {
 
   private extractWeatherDetails(data: any): void {
     this.weather = data;
-    this.events = this.getWeatherEvents(data.daily?.weathercode ?? []);
-  }
-
-  private getWeatherEvents(codes: number[]): string[] {
-    const codeEventMap: Record<number, string> = {
-      0: '☀️ Clear Sky', 2: '💨 Windy', 3: '💨 Windy',
-      45: '🌫️ Dense Fog', 48: '🌫️ Dense Fog',
-      51: '🌧️ Rain', 61: '🌧️ Rain', 63: '🌧️ Rain',
-      72: '🌨️ Snowfall', 77: '🌨️ Snowfall',
-      85: '❄️ Blizzard', 86: '❄️ Blizzard',
-      95: '⛈️ Thunderstorm', 96: '⛈️ Thunderstorm', 99: '⛈️ Thunderstorm'
-    };
-
-    return [...new Set(codes.map(code => codeEventMap[code]).filter(Boolean))];
+    this.events = data.events || [];
   }
 
   fetchWeatherByCity(): void {

@@ -100,7 +100,8 @@
       </div>
       <!-- Hourly small cards -->
 <div *ngIf="weather?.todayEntries?.length">
-  <h4 style="text-align: center;">Today's Hourly Forecast 🌦️</h4>
+  <h4 style="text-align: center;">Today's Hourly Forecast of 
+        <span *ngIf="weather.city">{{ weather.city }}</span>🌦️</h4>
   <div class="hourly-cards-grid">
     <div class="hour-card" *ngFor="let e of weather.todayEntries">
       <div class="hour-top">🕓 {{ e.displayTime || (e.timeIso | date:'shortTime') }}</div>
