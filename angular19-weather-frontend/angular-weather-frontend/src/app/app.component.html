@@ -81,7 +81,6 @@
 
         <div class="weather-card" *ngIf="weather.current_weather?.temperature">
           <h4>☀️ Current Weather {{ weather.current_weather?.temperature }} °C</h4>
-          <p><strong>🕓 At:</strong> {{ weather.current_weather?.time | date:'medium' }}</p>
           <p><strong>⚠️ {{ weather.eventForecast }} </strong></p>
           <p><strong>💨 Wind speed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
           <p><strong>🧭 Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°</p>
