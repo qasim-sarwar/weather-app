@@ -1,10 +1,30 @@
 ﻿using DotnetWeatherBackend;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.RateLimiting;
 using Polly;
 using Polly.Extensions.Http;
 using System.Threading.RateLimiting;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/weatherlog.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+//HTTP logging for middle
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = HttpLoggingFields.All;
+    logging.RequestHeaders.Add("sec-ch-ua");
+    logging.ResponseHeaders.Add("MyResponseHeader");
+    logging.MediaTypeOptions.AddText("application/javascript");
+    logging.RequestBodyLogLimit = 4096;
+    logging.ResponseBodyLogLimit = 4096;
+    logging.CombineLogs = true;
+});
 
 //  Swagger 
 builder.Services.AddEndpointsApiExplorer();
@@ -64,17 +84,23 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-//  CORS 
+// Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular", policy =>
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    options.AddPolicy("AllowFrontendApps", policy =>
+    {
+        policy.WithOrigins(
+            builder.Configuration["Frontend:ReactOrigin"]!,
+            builder.Configuration["Frontend:AngularOrigin"]!
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
 });
 
 builder.Services.AddOpenApi();
-
+builder.Host.UseSerilog();
 var app = builder.Build();
 
 //  Development environment setup 
@@ -87,7 +113,7 @@ if (app.Environment.IsDevelopment())
 
 //  Middleware pipeline 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngular");
+app.UseCors("AllowFrontendApps");
 app.UseAuthorization();
 app.UseRateLimiter();
 

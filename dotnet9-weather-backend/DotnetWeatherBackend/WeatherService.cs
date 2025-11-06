@@ -103,7 +103,7 @@ public class WeatherService
                                     Temperature = hourlyTemps[i],
                                     WeatherCode = (hourlyCodes != null && hourlyCodes.Count > i) ? (int?)hourlyCodes[i] : null
                                 };
-                                entry.Event = DetectSevereWeather(entry.WeatherCode ?? 0, entry.Temperature);
+                                entry.Event = DetectSevereWeather(forecast.CurrentWeather?.WeatherCode ?? 0, entry.Temperature);
                                 todayEntries.Add(entry);
                             }
                         }
@@ -126,7 +126,7 @@ public class WeatherService
                             Temperature = hourlyTemps[i],
                             WeatherCode = (forecast.Hourly?.WeatherCode != null && forecast.Hourly.WeatherCode.Count > i) ? (int?)forecast.Hourly.WeatherCode[i] : null
                         };
-                        entry.Event = DetectSevereWeather(entry.WeatherCode ?? 0, entry.Temperature);
+                        entry.Event = DetectSevereWeather(forecast.CurrentWeather?.WeatherCode ?? 0, entry.Temperature);
                         todayEntries.Add(entry);
                     }
                     _logger.LogWarning("No hourly entries matched today's date; using first {Len} hours as fallback.", todayEntries.Count);
@@ -170,7 +170,7 @@ public class WeatherService
                 var curDt = DateTime.Parse(forecast.CurrentWeather.Time, CultureInfo.InvariantCulture, DateTimeStyles.None);
                 var curDto = new DateTimeOffset(curDt, offset);
                 forecast.CurrentWeather.Time = curDto.ToString("o");
-                forecast.DayName = DateTime.UtcNow.DayOfWeek.ToString();
+                forecast.DayName = DateTime.UtcNow.ToString("dddd, dd MMMM yyyy", CultureInfo.InvariantCulture);
                 forecast.City = await GetCityNameFromApi(lat, lon);
             }
 
