@@ -5,113 +5,99 @@
   --vivid-pink: oklch(69.02% 0.277 332.77);
   --hot-red: oklch(61.42% 0.238 15.34);
   --orange-red: oklch(63.32% 0.24 31.68);
+
   --gray-900: oklch(19.37% 0.006 300.98);
   --gray-700: oklch(36.98% 0.014 302.71);
   --gray-400: oklch(70.9% 0.015 304.04);
+
   --red-to-pink-to-purple-vertical-gradient: linear-gradient(
     180deg,
     var(--orange-red) 0%,
     var(--vivid-pink) 50%,
     var(--electric-violet) 100%
   );
+
   --pill-accent: var(--bright-blue);
+
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol";
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-html,
-body {
-  background: url('https://wallpapers.com/images/high/natural-mist-above-mountains-u3ejbzzd9tozy3bw.webp')
-    center center / cover no-repeat;
+html, body {
+  min-height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background:
+    linear-gradient(135deg, #90caf9 0%, #e3f2fd 100%),
+    url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1200&q=80') center center / cover no-repeat;
+  position: relative;
 }
 
 .main {
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   padding: 2rem 1rem;
+  box-sizing: border-box;
+  position: relative;
 }
 
-h1 {
-  font-size: 3rem;
-  color: var(--gray-900);
-  margin: 0;
-}
+h1 { font-size: 3.125rem; color: var(--gray-900); font-weight: 500; margin: 0; }
+p { margin: 0; color: var(--gray-700); }
 
-p {
-  color: var(--gray-700);
-  margin: 0;
-}
+.content { display:flex; flex-direction:column; align-items:center; width:100%; margin-bottom:3rem; position:relative; z-index:1; }
 
-.weather-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-  margin-top: 2rem;
-}
+.weather-form-row { display:flex; align-items:center; justify-content:center; gap:2rem; margin-bottom:1rem; width:100%; max-width:1100px; }
+.weather-form-section { flex:1; min-width:220px; display:flex; flex-direction:column; align-items:center; }
+.weather-divider { width:1px; height:80px; background:#dfe1e5; box-shadow:0 1px 2px rgba(32,33,36,0.28); margin:0 1rem; border-radius:1px; }
 
-.weather-input {
-  max-width: 350px;
-  width: 90%;
-  padding: 1rem 1.5rem;
-  border-radius: 24px;
-  border: 1px solid #dfe1e5;
-  font-size: 1.25rem;
-  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
-  outline: none;
-  transition: border-color 0.2s;
-}
+.input-row { display:flex; gap:1rem; width:100%; justify-content:center; }
+.weather-input { flex:1; min-width:0; max-width:350px; padding:1rem 1.5rem; border-radius:24px; border:1px solid #dfe1e5; font-size:1.05rem; background:transparent; box-shadow:0 1px 6px rgba(32,33,36,0.28); outline:none; transition:border-color 0.2s; }
+.weather-input:focus { border-color:#4285f4; box-shadow:0 1px 6px rgba(66,133,244,0.28); }
 
-.weather-input:focus {
-  border-color: #4285f4;
-  box-shadow: 0 1px 6px rgba(66, 133, 244, 0.28);
-}
+.weather-btn { width:100%; max-width:350px; padding:1rem 1.5rem; border-radius:24px; background:radial-gradient(#2a2170,#514990); color:white; font-size:1.05rem; border:none; cursor:pointer; margin-top:0.5rem; box-shadow:0 1px 6px rgba(66,133,244,0.18); }
+.weather-btn:hover { background:#357ae8; }
 
-.weather-btn {
-  width: 90%;
-  max-width: 350px;
-  padding: 1rem 1.5rem;
-  border-radius: 24px;
-  background: radial-gradient(#2a2170, #514990);
-  color: white;
-  font-size: 1.25rem;
-  border: none;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  box-shadow: 0 1px 6px rgba(66, 133, 244, 0.18);
-}
+.weather-result { padding:1rem; border-radius:16px; border:1px solid #dfe1e5; box-shadow:0 1px 6px rgba(32,33,36,0.28); max-width:1200px; width:100%; color:#000; margin:0 auto; }
+.weather-result h3 { text-align:center; margin:0; }
 
-.weather-btn:hover {
-  background: #357ae8;
-}
+.card-container { display:flex; justify-content:space-evenly; gap:10px; flex-wrap:wrap; padding:10px; overflow-x:auto; }
+.weather-card { border-radius:10px; padding:15px; width:250px; text-align:center; border:1px solid #dfe1e5; box-shadow:0 2px 6px rgba(0,0,0,0.15); display:flex; flex-direction:column; }
+.weather-card h4 { margin:5px 0; }
+.temp-large { font-size:1.5rem; font-weight:bold; }
 
-.weather-result {
-  padding: 1rem;
-  border-radius: 16px;
-  border: 1px solid #dfe1e5;
-  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
-  max-width: 1200px;
-  width: 100%;
-  color: #000;
-  margin: 0 auto;
-  text-align: center;
-}
+.event-section { border-radius:8px; background:transparent; }
+.event-section ul { list-style:none; padding:0; margin:0; }
+.event-section li { font-weight:bolder; }
 
-.weather-card {
-  border-radius: 10px;
-  padding: 15px;
-  width: 250px;
-  text-align: center;
-  border: 1px solid #dfe1e5;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-}
+.hourly-cards-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:0.75rem; align-items:stretch; margin-top:1rem; }
+.hour-card { background:transparent; border-radius:6px; padding:0.5rem; border:1px solid #dfe1e5; box-shadow:0 1px 6px rgba(32,33,36,0.28); text-align:center; display:flex; flex-direction:column; gap:0.25rem; font-size:0.85rem; }
+.hour-top { font-size:0.85rem; font-weight:600; }
+.hour-temp { font-size:1.05rem; font-weight:700; }
+.hour-event { font-size:0.85rem; color:black; margin-top:auto; }
 
-.temp-large {
-  font-size: 1.5rem;
-  font-weight: bold;
+.error-msg { color:#e53935; margin-top:1rem; font-weight:500; text-align:center; }
+
+.loader { display:flex; justify-content:center; margin-top:20px; }
+.spinner { border:4px solid rgba(0,0,0,0.1); width:40px; height:40px; border-radius:50%; border-left-color:#2a2170; animation:spin 1s ease infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+@media screen and (max-width:900px) {
+  .weather-form-row { flex-direction:column; gap:1.5rem; }
+  .weather-divider { display:none; }
+}
+@media screen and (max-width:650px) {
+  .card-container { flex-direction:column; align-items:center; gap:15px; }
+  .weather-card { width:90%; max-width:300px; }
+  .weather-input, .weather-btn { width:90%; font-size:1.05rem; padding:0.9rem 1.2rem; }
 }
