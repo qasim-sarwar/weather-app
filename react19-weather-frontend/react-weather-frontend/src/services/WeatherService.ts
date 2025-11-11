@@ -1,9 +1,15 @@
 import { apiConfig } from '../config/apiConfig';
 import type { WeatherResponse } from '../types/weather';
 
+type CityResponse = {
+  name?: string;
+  country?: string;
+  [key: string]: unknown;
+};
+
 const sanitize = (u: string) => u.replace(/\/$/, '');
 
-async function fetchJson<T>(url: string): Promise<T> {
+async function fetchJson<T = unknown>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -34,18 +40,19 @@ export async function getWeather(params: { city?: string; lat?: number; lon?: nu
   return fetchJson<WeatherResponse>(`/api/weather${q}`);
 }
 
-export async function getCityName(lat: number, lon: number): Promise<any> {
-  const node = apiConfig.nodeBaseUrl ? `${sanitize(apiConfig.nodeBaseUrl)}/city?lat=${lat}&lon=${lon}` : null;
-  const dot = apiConfig.dotnetBaseUrl ? `${sanitize(apiConfig.dotnetBaseUrl)}/city?lat=${lat}&lon=${lon}` : null;
+export async function getCityName(lat: number, lon: number): Promise<CityResponse> {
+  const q = `?lat=${lat}&lon=${lon}`;
+  const node = apiConfig.nodeBaseUrl ? `${sanitize(apiConfig.nodeBaseUrl)}/city${q}` : null;
+  const dot = apiConfig.dotnetBaseUrl ? `${sanitize(apiConfig.dotnetBaseUrl)}/city${q}` : null;
 
   if (node) {
     try {
-      return await fetchJson(node);
-    } catch {
-      console.warn('Node city lookup failed, falling back to .NET');
+      return await fetchJson<CityResponse>(node);
+    } catch (err) {
+      console.warn('Node city lookup failed, falling back to .NET', (err as Error).message);
     }
   }
-  if (dot) return fetchJson(dot);
+  if (dot) return fetchJson<CityResponse>(dot);
 
-  return fetchJson(`/api/city?lat=${lat}&lon=${lon}`);
+  return fetchJson<CityResponse>(`/api/city${q}`);
 }

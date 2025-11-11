@@ -16,7 +16,9 @@ export default function WeatherCard({ weather }: { weather: WeatherResponse | nu
         {typeof weather.minTemp !== 'undefined' && weather.minTemp !== null && (
           <div className="weather-card">
             <h4>🌡️ Min Temperature {weather.minTemp} °C</h4>
-            <p><strong>🕓 At:</strong> {weather.minTempTime ?? '-'}</p>
+            <p><strong>🕓 At:</strong> {weather.minTempTime
+    ? new Date(weather.minTempTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : '-'}</p>
           </div>
         )}
 
@@ -41,7 +43,9 @@ export default function WeatherCard({ weather }: { weather: WeatherResponse | nu
         {typeof weather.maxTemp !== 'undefined' && weather.maxTemp !== null && (
           <div className="weather-card">
             <h4>🔥 Max Temperature {weather.maxTemp} °C</h4>
-            <p><strong>🕓 At:</strong> {weather.maxTempTime ?? '-'}</p>
+            <p><strong>🕓 At:</strong> {weather.maxTempTime
+    ? new Date(weather.maxTempTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : '-'}</p>
           </div>
         )}
       </div>
