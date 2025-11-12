@@ -1,4 +1,3 @@
-import React from 'react';
 import type { WeatherResponse } from '../types/weather';
 
 export default function WeatherCard({ weather }: { weather: WeatherResponse | null }) {
