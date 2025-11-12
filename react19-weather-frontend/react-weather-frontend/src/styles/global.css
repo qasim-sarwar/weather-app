@@ -35,8 +35,7 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   background:
-    linear-gradient(135deg, #90caf9 0%, #e3f2fd 100%),
-    url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1200&q=80') center center / cover no-repeat;
+    url('https://wallpapers.com/images/high/natural-mist-above-mountains-u3ejbzzd9tozy3bw.webp') center center / cover no-repeat;
   position: relative;
 }
 
