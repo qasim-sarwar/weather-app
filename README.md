@@ -1,5 +1,5 @@
 # 🌤 Weather App
-The backend is built with **Node.js + Express**, and the frontend is built with **Angular**.
+The backend is built with **Node.js + Express**, and the frontend is built with **Angular 19** and **React 19** .
 
 
 A full-stack weather application built with Angular (frontend) and Node.js + Express (backend).
@@ -23,10 +23,11 @@ The backend consumes the Open-Meteo API that fetches real-time weather data usin
 
 ## 📂 Project Structure
 weather-app/
-├── angular-frontend/     # Angular application (UI)
-├── node-backend/         # Node.js + Express backend
-├── DotnetWeatherBackend/       # .NET 9 Minimal API backend
-├── DotnetWeatherBackend.Tests/ # .NET 9 Minimal API compatible xUnit Project
+├── angular-frontend/     # Angular 19 application (UI)
+├── reactjs-frontend/     # React 19 application (UI)
+├── node-backend/         # Node.js 18 + Express backend
+├── DotnetWeatherBackend/       # .NET 10 Minimal API backend
+├── DotnetWeatherBackend.Tests/ # .NET 10 Minimal API compatible xUnit Project
 └── README.md             # Project documentation
 
 
@@ -68,8 +69,16 @@ npm install
 ng serve --open
 
 
-The app will run at:
+For Angular : The app will run at:
 👉 http://localhost:4200
+
+For React : The app will run at:
+http://localhost:5173/
+
+Setup & Run
+cd react-weather-frontend
+npm install
+npm run dev
 
 2. Node.js Backend
 
@@ -87,7 +96,7 @@ The backend for Node.js will run at:
 3. .NET Backend (Minimal API)
 The backend for Node.js will run at:
 👉 https://localhost:5000/api/weather
-A .NET 8 Minimal API alternative backend that returns weather forecast data.
+A .NET 10 Minimal API alternative backend that returns weather forecast data.
 
 Setup & Run
 cd dotnet-backend
