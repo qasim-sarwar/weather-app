@@ -1,0 +1,236 @@
+2025-11-12 16:04:50.733 +09:00 [DBG] Hosting starting
+2025-11-12 16:04:50.829 +09:00 [DBG] Middleware loaded
+2025-11-12 16:04:50.836 +09:00 [DBG] Middleware loaded. Script /_framework/aspnetcore-browser-refresh.js (16525 B).
+2025-11-12 16:04:50.841 +09:00 [DBG] Middleware loaded. Script /_framework/blazor-hotreload.js (799 B).
+2025-11-12 16:04:51.114 +09:00 [DBG] Middleware configuration started with options: {AllowedHosts = *, AllowEmptyHosts = True, IncludeFailureMessage = True}
+2025-11-12 16:04:51.121 +09:00 [DBG] Wildcard detected, all requests with hosts will be allowed.
+2025-11-12 16:04:51.135 +09:00 [DBG] Middleware loaded: DOTNET_MODIFIABLE_ASSEMBLIES=debug, __ASPNETCORE_BROWSER_TOOLS=true
+2025-11-12 16:04:51.309 +09:00 [INF] Now listening on: https://localhost:5000
+2025-11-12 16:04:51.311 +09:00 [DBG] Loaded hosting startup assembly DotnetWeatherBackend
+2025-11-12 16:04:51.315 +09:00 [DBG] Loaded hosting startup assembly Microsoft.WebTools.ApiEndpointDiscovery
+2025-11-12 16:04:51.316 +09:00 [DBG] Loaded hosting startup assembly Microsoft.AspNetCore.Watch.BrowserRefresh
+2025-11-12 16:04:51.318 +09:00 [DBG] Loaded hosting startup assembly Microsoft.WebTools.BrowserLink.Net
+2025-11-12 16:04:51.331 +09:00 [INF] No action descriptors found. This may indicate an incorrectly configured application or missing application parts. To learn more, visit https://aka.ms/aspnet/mvc/app-parts
+2025-11-12 16:04:51.335 +09:00 [DBG] Executing API description provider 'EndpointMetadataApiDescriptionProvider' from assembly Microsoft.AspNetCore.Mvc.ApiExplorer v9.0.0.0.
+2025-11-12 16:04:51.413 +09:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-11-12 16:04:51.417 +09:00 [INF] Hosting environment: Development
+2025-11-12 16:04:51.420 +09:00 [INF] Content root path: C:\Users\qasim\source\repos\weather-app\dotnet9-weather-backend\DotnetWeatherBackend
+2025-11-12 16:04:51.430 +09:00 [DBG] Hosting started
+2025-11-12 16:06:13.116 +09:00 [DBG] Connection id "0HNH1N7RH8FR4" accepted.
+2025-11-12 16:06:13.121 +09:00 [DBG] Connection id "0HNH1N7RH8FR4" started.
+2025-11-12 16:06:13.234 +09:00 [DBG] Connection 0HNH1N7RH8FR4 established using the following protocol: "Tls13"
+2025-11-12 16:06:13.312 +09:00 [INF] Request starting HTTP/2 GET https://localhost:5000/api/weather?city=lahore - null null
+2025-11-12 16:06:13.364 +09:00 [DBG] 1 candidate(s) found for the request path '/api/weather'
+2025-11-12 16:06:13.373 +09:00 [DBG] Request matched endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:06:13.395 +09:00 [DBG] The request has an origin header: 'http://localhost:5173'.
+2025-11-12 16:06:13.399 +09:00 [INF] CORS policy execution successful.
+2025-11-12 16:06:13.427 +09:00 [INF] Executing endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:06:13.529 +09:00 [INF] Start processing HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:06:13.542 +09:00 [INF] Sending HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:06:15.072 +09:00 [INF] Received HTTP response headers after 1522.261ms - 200
+2025-11-12 16:06:15.082 +09:00 [INF] End processing HTTP request after 1556.1349ms - 200
+2025-11-12 16:06:15.158 +09:00 [INF] Start processing HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:06:15.164 +09:00 [INF] Sending HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:06:17.065 +09:00 [INF] Received HTTP response headers after 1892.4845ms - 200
+2025-11-12 16:06:17.071 +09:00 [INF] End processing HTTP request after 1912.9624ms - 200
+2025-11-12 16:06:17.154 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:06:17.160 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:06:18.527 +09:00 [INF] Received HTTP response headers after 1362.5806ms - 200
+2025-11-12 16:06:18.532 +09:00 [INF] End processing HTTP request after 1377.2648ms - 200
+2025-11-12 16:06:18.546 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:06:18.554 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:06:19.318 +09:00 [INF] Received HTTP response headers after 754.0231ms - 200
+2025-11-12 16:06:19.322 +09:00 [INF] End processing HTTP request after 776.761ms - 200
+2025-11-12 16:06:19.336 +09:00 [INF] Setting HTTP status code 200.
+2025-11-12 16:06:19.338 +09:00 [INF] Writing value of type 'WeatherForecast' as Json.
+2025-11-12 16:06:19.371 +09:00 [INF] Executed endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:06:19.390 +09:00 [INF] Request finished HTTP/2 GET https://localhost:5000/api/weather?city=lahore - 200 null application/json; charset=utf-8 6083.2367ms
+2025-11-12 16:06:19.510 +09:00 [DBG] Connection id "0HNH1N7RH8FR4" received FIN.
+2025-11-12 16:06:19.552 +09:00 [DBG] The connection queue processing loop for 0HNH1N7RH8FR4 completed.
+2025-11-12 16:06:19.552 +09:00 [DBG] Connection id "0HNH1N7RH8FR4" is closed. The last processed stream ID was 1.
+2025-11-12 16:06:19.561 +09:00 [DBG] Connection id "0HNH1N7RH8FR4" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-11-12 16:06:19.573 +09:00 [DBG] Connection id "0HNH1N7RH8FR4" stopped.
+2025-11-12 16:06:56.521 +09:00 [DBG] Connection id "0HNH1N7RH8FR5" accepted.
+2025-11-12 16:06:56.523 +09:00 [DBG] Connection id "0HNH1N7RH8FR5" started.
+2025-11-12 16:06:56.529 +09:00 [DBG] Connection 0HNH1N7RH8FR5 established using the following protocol: "Tls13"
+2025-11-12 16:06:56.533 +09:00 [INF] Request starting HTTP/2 GET https://localhost:5000/api/weather?city=lahore - null null
+2025-11-12 16:06:56.573 +09:00 [DBG] 1 candidate(s) found for the request path '/api/weather'
+2025-11-12 16:06:56.575 +09:00 [DBG] Request matched endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:06:56.579 +09:00 [DBG] The request has an origin header: 'http://localhost:5173'.
+2025-11-12 16:06:56.581 +09:00 [INF] CORS policy execution successful.
+2025-11-12 16:06:56.583 +09:00 [INF] Executing endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:06:56.586 +09:00 [INF] Setting HTTP status code 200.
+2025-11-12 16:06:56.587 +09:00 [INF] Writing value of type 'WeatherForecast' as Json.
+2025-11-12 16:06:56.589 +09:00 [INF] Executed endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:06:56.592 +09:00 [INF] Request finished HTTP/2 GET https://localhost:5000/api/weather?city=lahore - 200 null application/json; charset=utf-8 58.8206ms
+2025-11-12 16:06:59.547 +09:00 [DBG] Connection id "0HNH1N7RH8FR5" received FIN.
+2025-11-12 16:06:59.550 +09:00 [DBG] Connection id "0HNH1N7RH8FR5" is closed. The last processed stream ID was 1.
+2025-11-12 16:06:59.550 +09:00 [DBG] The connection queue processing loop for 0HNH1N7RH8FR5 completed.
+2025-11-12 16:06:59.554 +09:00 [DBG] Connection id "0HNH1N7RH8FR5" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-11-12 16:06:59.566 +09:00 [DBG] Connection id "0HNH1N7RH8FR5" stopped.
+2025-11-12 16:07:00.373 +09:00 [DBG] Connection id "0HNH1N7RH8FR6" accepted.
+2025-11-12 16:07:00.377 +09:00 [DBG] Connection id "0HNH1N7RH8FR6" started.
+2025-11-12 16:07:00.384 +09:00 [DBG] Connection 0HNH1N7RH8FR6 established using the following protocol: "Tls13"
+2025-11-12 16:07:00.388 +09:00 [INF] Request starting HTTP/2 GET https://localhost:5000/api/weather?city=tokyo - null null
+2025-11-12 16:07:00.395 +09:00 [DBG] 1 candidate(s) found for the request path '/api/weather'
+2025-11-12 16:07:00.397 +09:00 [DBG] Request matched endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:07:00.402 +09:00 [DBG] The request has an origin header: 'http://localhost:5173'.
+2025-11-12 16:07:00.404 +09:00 [INF] CORS policy execution successful.
+2025-11-12 16:07:00.406 +09:00 [INF] Executing endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:07:00.410 +09:00 [INF] Start processing HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:07:00.416 +09:00 [INF] Sending HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:07:00.710 +09:00 [INF] Received HTTP response headers after 292.5649ms - 200
+2025-11-12 16:07:00.714 +09:00 [INF] End processing HTTP request after 303.9534ms - 200
+2025-11-12 16:07:00.719 +09:00 [INF] Start processing HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:07:00.722 +09:00 [INF] Sending HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:07:01.132 +09:00 [INF] Received HTTP response headers after 406.3276ms - 200
+2025-11-12 16:07:01.150 +09:00 [INF] End processing HTTP request after 430.5292ms - 200
+2025-11-12 16:07:01.157 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:07:01.159 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:07:02.600 +09:00 [INF] Received HTTP response headers after 1437.7949ms - 200
+2025-11-12 16:07:02.604 +09:00 [INF] End processing HTTP request after 1447.6266ms - 200
+2025-11-12 16:07:02.610 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:07:02.614 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:07:03.595 +09:00 [INF] Received HTTP response headers after 979.0981ms - 200
+2025-11-12 16:07:03.601 +09:00 [INF] End processing HTTP request after 990.7564ms - 200
+2025-11-12 16:07:03.604 +09:00 [INF] Setting HTTP status code 200.
+2025-11-12 16:07:03.607 +09:00 [INF] Writing value of type 'WeatherForecast' as Json.
+2025-11-12 16:07:03.610 +09:00 [INF] Executed endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:07:03.614 +09:00 [INF] Request finished HTTP/2 GET https://localhost:5000/api/weather?city=tokyo - 200 null application/json; charset=utf-8 3226.2791ms
+2025-11-12 16:07:09.552 +09:00 [DBG] Connection id "0HNH1N7RH8FR6" received FIN.
+2025-11-12 16:07:09.558 +09:00 [DBG] Connection id "0HNH1N7RH8FR6" is closed. The last processed stream ID was 1.
+2025-11-12 16:07:09.558 +09:00 [DBG] The connection queue processing loop for 0HNH1N7RH8FR6 completed.
+2025-11-12 16:07:09.561 +09:00 [DBG] Connection id "0HNH1N7RH8FR6" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-11-12 16:07:09.571 +09:00 [DBG] Connection id "0HNH1N7RH8FR6" stopped.
+2025-11-12 16:08:13.489 +09:00 [DBG] HttpMessageHandler expired after 120000ms for client ''
+2025-11-12 16:08:23.499 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:08:23.507 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0849ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:08:33.510 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:08:33.513 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0072ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:08:43.516 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:08:43.518 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.004ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:08:53.521 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:08:53.532 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0064ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:09:03.544 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:09:03.551 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0064ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:09:13.565 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:09:13.570 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0083ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:09:23.580 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:09:23.583 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0084ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:09:33.592 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:09:33.608 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0049ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:09:35.094 +09:00 [DBG] Connection id "0HNH1N7RH8FR7" accepted.
+2025-11-12 16:09:35.098 +09:00 [DBG] Connection id "0HNH1N7RH8FR7" started.
+2025-11-12 16:09:35.109 +09:00 [DBG] Connection 0HNH1N7RH8FR7 established using the following protocol: "Tls13"
+2025-11-12 16:09:35.116 +09:00 [INF] Request starting HTTP/2 GET https://localhost:5000/api/weather?city=hanayama - null null
+2025-11-12 16:09:35.160 +09:00 [DBG] 1 candidate(s) found for the request path '/api/weather'
+2025-11-12 16:09:35.163 +09:00 [DBG] Request matched endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:09:35.164 +09:00 [DBG] The request has an origin header: 'http://localhost:5173'.
+2025-11-12 16:09:35.166 +09:00 [INF] CORS policy execution successful.
+2025-11-12 16:09:35.170 +09:00 [INF] Executing endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:09:35.178 +09:00 [INF] Start processing HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:09:35.182 +09:00 [INF] Sending HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:09:36.731 +09:00 [INF] Received HTTP response headers after 1541.5757ms - 200
+2025-11-12 16:09:36.736 +09:00 [INF] End processing HTTP request after 1558.398ms - 200
+2025-11-12 16:09:36.739 +09:00 [INF] Start processing HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:09:36.740 +09:00 [INF] Sending HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:09:38.218 +09:00 [INF] Received HTTP response headers after 1475.7727ms - 200
+2025-11-12 16:09:38.223 +09:00 [INF] End processing HTTP request after 1483.7452ms - 200
+2025-11-12 16:09:38.227 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:09:38.231 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:09:39.474 +09:00 [INF] Received HTTP response headers after 1240.4927ms - 200
+2025-11-12 16:09:39.478 +09:00 [INF] End processing HTTP request after 1250.5295ms - 200
+2025-11-12 16:09:39.482 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:09:39.484 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:09:40.398 +09:00 [INF] Received HTTP response headers after 908.9628ms - 200
+2025-11-12 16:09:40.410 +09:00 [INF] End processing HTTP request after 928.5271ms - 200
+2025-11-12 16:09:40.429 +09:00 [INF] Setting HTTP status code 200.
+2025-11-12 16:09:40.434 +09:00 [INF] Writing value of type 'WeatherForecast' as Json.
+2025-11-12 16:09:40.441 +09:00 [INF] Executed endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:09:40.446 +09:00 [INF] Request finished HTTP/2 GET https://localhost:5000/api/weather?city=hanayama - 200 null application/json; charset=utf-8 5328.9957ms
+2025-11-12 16:09:43.617 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:09:43.623 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0064ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:09:53.636 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:09:53.651 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0079ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:10:03.658 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:10:03.662 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0076ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:10:13.666 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:10:13.670 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0067ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:10:23.675 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:10:23.681 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0211ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:10:33.687 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:10:33.690 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0048ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:10:43.700 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:10:43.701 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0043ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:10:53.707 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:10:53.713 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0066ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:11:03.729 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:11:03.734 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0058ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:11:13.744 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:11:13.752 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0049ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:11:23.757 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:11:23.763 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0043ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:11:33.769 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:11:33.774 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0044ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:11:35.175 +09:00 [DBG] HttpMessageHandler expired after 120000ms for client ''
+2025-11-12 16:11:43.783 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:11:43.789 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0041ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:11:53.804 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:11:53.808 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0038ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:11:58.210 +09:00 [INF] Request starting HTTP/2 GET https://localhost:5000/api/weather?city=kobe - null null
+2025-11-12 16:11:58.245 +09:00 [DBG] 1 candidate(s) found for the request path '/api/weather'
+2025-11-12 16:11:58.250 +09:00 [DBG] Request matched endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:11:58.253 +09:00 [DBG] The request has an origin header: 'http://localhost:5173'.
+2025-11-12 16:11:58.256 +09:00 [INF] CORS policy execution successful.
+2025-11-12 16:11:58.259 +09:00 [INF] Executing endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:11:58.270 +09:00 [INF] Start processing HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:11:58.275 +09:00 [INF] Sending HTTP request GET https://geocoding-api.open-meteo.com/v1/search?*
+2025-11-12 16:11:59.694 +09:00 [INF] Received HTTP response headers after 1416.4521ms - 200
+2025-11-12 16:11:59.698 +09:00 [INF] End processing HTTP request after 1428.1906ms - 200
+2025-11-12 16:11:59.701 +09:00 [INF] Start processing HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:11:59.704 +09:00 [INF] Sending HTTP request GET https://api.open-meteo.com/v1/forecast?*
+2025-11-12 16:12:00.991 +09:00 [INF] Received HTTP response headers after 1285.1785ms - 200
+2025-11-12 16:12:00.996 +09:00 [INF] End processing HTTP request after 1295.217ms - 200
+2025-11-12 16:12:00.999 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:12:01.002 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:12:02.048 +09:00 [INF] Received HTTP response headers after 1044.9851ms - 200
+2025-11-12 16:12:02.052 +09:00 [INF] End processing HTTP request after 1053.114ms - 200
+2025-11-12 16:12:02.058 +09:00 [INF] Start processing HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:12:02.060 +09:00 [INF] Sending HTTP request GET https://nominatim.openstreetmap.org/reverse?*
+2025-11-12 16:12:02.970 +09:00 [INF] Received HTTP response headers after 906.6686ms - 200
+2025-11-12 16:12:02.975 +09:00 [INF] End processing HTTP request after 917.6615ms - 200
+2025-11-12 16:12:02.979 +09:00 [INF] Setting HTTP status code 200.
+2025-11-12 16:12:02.981 +09:00 [INF] Writing value of type 'WeatherForecast' as Json.
+2025-11-12 16:12:02.990 +09:00 [INF] Executed endpoint 'HTTP: GET /api/weather'
+2025-11-12 16:12:02.996 +09:00 [INF] Request finished HTTP/2 GET https://localhost:5000/api/weather?city=kobe - 200 null application/json; charset=utf-8 4785.6592ms
+2025-11-12 16:12:03.813 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:12:03.817 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.004ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:12:13.832 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:12:13.836 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.006ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:12:23.846 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:12:23.856 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0072ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:12:33.864 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:12:33.867 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0063ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:12:43.884 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:12:43.889 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.008ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:12:53.892 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:12:53.910 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0077ms - processed: 0 items - remaining: 2 items
+2025-11-12 16:13:03.923 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 2 items
+2025-11-12 16:13:03.938 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.4369ms - processed: 2 items - remaining: 0 items
+2025-11-12 16:13:58.273 +09:00 [DBG] HttpMessageHandler expired after 120000ms for client ''
+2025-11-12 16:14:08.282 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:14:08.293 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.1558ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:14:18.323 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:14:18.328 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.006ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:14:28.343 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:14:28.346 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.004ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:14:38.363 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:14:38.369 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0041ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:14:48.372 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:14:48.378 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0036ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:14:58.397 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:14:58.403 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0041ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:15:08.412 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:15:08.415 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0037ms - processed: 0 items - remaining: 1 items
+2025-11-12 16:15:18.432 +09:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-11-12 16:15:18.435 +09:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0039ms - processed: 0 items - remaining: 1 items
