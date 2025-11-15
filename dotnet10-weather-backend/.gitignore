@@ -9,6 +9,9 @@ obj/
 *.vscode/
 *.DS_Store
 
+# Logs folder
+Logs/
+
 # Rider / JetBrains
 .idea/
 

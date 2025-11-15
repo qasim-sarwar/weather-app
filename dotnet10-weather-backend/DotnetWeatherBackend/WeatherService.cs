@@ -178,7 +178,7 @@ public class WeatherService
             forecast.City = await GetCityNameFromApi(lat, lon);
 
             // Event detection
-            forecast.EventForecast = DetectSevereWeather(forecast.CurrentWeather?.WeatherCode ?? 0, forecast.MaxTemp);
+            forecast.EventForecast = DetectSevereWeather(forecast.CurrentWeather?.WeatherCode ?? 0, forecast.CurrentWeather?.Temperature);
 
             // cache and return
             _cache.Set(cacheKey, forecast, TimeSpan.FromMinutes(10));
@@ -296,7 +296,6 @@ public class WeatherService
                                data?.Address?.State;
 
             return !string.IsNullOrEmpty(cityName) ? cityName : $"{lat},{lon}";
-            ;
         }
         catch (HttpRequestException e)
         {
