@@ -275,7 +275,7 @@ public class WeatherService
         try
         {
             // Required by Nominatim to prevent 403 responses
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("DotnetWeatherBackend/1.0 (contact@example.com)");
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("DotnetWeatherBackend/10.0 (get@CityName.com)");
 
             var response = await _httpClient.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
