@@ -1,5 +1,3 @@
-import React from 'react';
-
 type Props = {
   city: string;
   setCity: (v: string) => void;

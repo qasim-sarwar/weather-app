@@ -30,4 +30,19 @@ export type WeatherResponse = {
   todayEntries?: WeatherEntry[];
   utc_offset_seconds?: number;
   timezone?: string | null;
+  // added daily to match backend response
+  daily?: {
+    time?: string[];
+    temperature_2m_min?: number[];
+    temperature_2m_max?: number[];
+    weathercode?: number[];
+  } | null;
+
+  // added hourly so WeatherCard can build 24-hour entries for any selected day
+  hourly?: {
+    time?: string[];               // array of "YYYY-MM-DDTHH:MM" strings
+    temperature_2m?: number[];     // same length as time
+    weathercode?: number[];
+    relativehumidity_2m?: (number | null)[] | null;
+  } | null;
 };

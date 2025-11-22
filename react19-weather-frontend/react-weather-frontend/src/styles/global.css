@@ -91,12 +91,72 @@ p { margin: 0; color: var(--gray-700); }
 .spinner { border:4px solid rgba(0,0,0,0.1); width:40px; height:40px; border-radius:50%; border-left-color:#2a2170; animation:spin 1s ease infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 
+/* Day selector (centered horizontal row, wraps on small screens) */
+.day-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Day button - make visually similar/transparent like weather-card */
+.day-button {
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #dfe1e5;
+  background: transparent; /* transparent like other cards */
+  cursor: pointer;
+  min-width: 96px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: transform 0.08s, border-color 0.12s, background 0.12s;
+}
+.day-button:hover { transform: translateY(-2px); }
+.day-button.selected {
+  border: 2px solid #0078d4;
+  background: rgba(230,240,251,0.6);
+}
+
+/* small circular icon used on day and hourly cards */
+.weather-icon, .hour-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 1.05rem;
+  background: transparent; /* removed white circle */
+  box-shadow: none;         /* removed shadow so emoji sits on transparent bg */
+}
+
+/* inside day button */
+.day-short { font-weight: 600; }
+.day-date { font-size: 0.8rem; color: #000; } /* make date black */
+.day-event { font-size: 0.75rem; color: #000; margin-top: 2px; } /* event text black */
+
+/* hourly card tweaks to show icon + text */
+.hour-card { 
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* ensure event text is readable (make fully black) */
+.hour-event { font-size: 0.85rem; color: #000; text-align: center; }
+
+/* center section title and make it black */
+.section-title { text-align: center; color: #000; margin-top: 0.5rem; }
+
 @media screen and (max-width:900px) {
   .weather-form-row { flex-direction:column; gap:1.5rem; }
   .weather-divider { display:none; }
-}
-@media screen and (max-width:650px) {
-  .card-container { flex-direction:column; align-items:center; gap:15px; }
-  .weather-card { width:90%; max-width:300px; }
-  .weather-input, .weather-btn { width:90%; font-size:1.05rem; padding:0.9rem 1.2rem; }
 }

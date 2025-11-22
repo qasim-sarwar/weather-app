@@ -5,6 +5,7 @@ using Polly;
 using Polly.Extensions.Http;
 using System.Threading.RateLimiting;
 using Serilog;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -101,7 +102,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 builder.Host.UseSerilog();
+builder.Services.AddHealthChecks()
+    .AddCheck("Weather Service Health Check", () => HealthCheckResult.Healthy("The App is Healthy"));
 var app = builder.Build();
+app.UseHealthChecks("/api/weather/health");
 
 //  Development environment setup 
 if (app.Environment.IsDevelopment())
