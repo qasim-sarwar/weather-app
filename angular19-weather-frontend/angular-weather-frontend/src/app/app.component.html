@@ -98,7 +98,7 @@
         </div>
       </div>
       <!-- Days Navigation and Hourly small cards -->
-<div *ngIf="days?.length" class="days-row">
+<div *ngIf="days.length" class="days-row">
   <div
     class="day-card"
     *ngFor="let d of days; let i = index"
@@ -117,11 +117,11 @@
 <h4 style="text-align: center; margin-top: 0.75rem;">
   Hourly Forecast of
   <span *ngIf="weather.city">{{ weather.city }}</span>
-  — <span *ngIf="days?.length">{{ days[selectedDayIndex]?.dayName }}</span>
+  — <span *ngIf="days.length">{{ days[selectedDayIndex]?.dayName }}</span>
   🌦️
 </h4>
 
-<div *ngIf="selectedHourlyEntries?.length" class="hourly-cards-grid">
+<div *ngIf="selectedHourlyEntries.length" class="hourly-cards-grid">
   <div class="hour-card" *ngFor="let e of selectedHourlyEntries">
     <div class="hour-top">🕓 {{ e.displayTime || (e.timeIso | date:'shortTime') }}</div>
     <div class="hour-temp">🌡️ {{ e.temperature }} °C</div>
