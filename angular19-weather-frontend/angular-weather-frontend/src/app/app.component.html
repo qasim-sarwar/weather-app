@@ -70,7 +70,6 @@
         Current Weather of
         <span *ngIf="weather.city">{{ weather.city }}</span>
         <span *ngIf="!weather.city">({{ weather.latitude }}, {{ weather.longitude }})</span>
-        <span>🕓On:{{ weather.dayName }}</span>
       </h3>
 
       <div class="card-container">
@@ -84,7 +83,7 @@
           <p><strong>⚠️ {{ weather.eventForecast }} </strong></p>
           <p><strong>💨 Wind speed:</strong> {{ weather.current_weather?.windspeed }} km/h</p>
           <p><strong>🧭 Wind Direction:</strong> {{ weather.current_weather?.winddirection }}°</p>
-                <div *ngIf="events.length > 0" class="event-section">
+          <div *ngIf="events.length > 0" class="event-section">
         <h4>🌦️ Forecasted Events</h4>
         <ul>
           <li *ngFor="let event of events">{{ event }}</li>
@@ -97,16 +96,35 @@
           <p><strong>🕓 At: </strong> {{ weather.maxTempTime | date:'shortTime' }}</p>
         </div>
       </div>
-      <!-- Hourly small cards -->
-<div *ngIf="weather?.todayEntries?.length">
-  <h4 style="text-align: center;">Today's Hourly Forecast of 
-        <span *ngIf="weather.city">{{ weather.city }}</span>🌦️</h4>
-  <div class="hourly-cards-grid">
-    <div class="hour-card" *ngFor="let e of weather.todayEntries">
-      <div class="hour-top">🕓 {{ e.displayTime || (e.timeIso | date:'shortTime') }}</div>
-      <div class="hour-temp">🌡️ {{ e.temperature }} °C</div>
-      <div class="hour-event"> {{ e.event }}</div>
-    </div>
+      <!-- Days Navigation and Hourly small cards -->
+<div *ngIf="days?.length" class="days-row">
+  <div
+    class="day-card"
+    *ngFor="let d of days; let i = index"
+    [class.active]="i === selectedDayIndex"
+    (click)="selectDay(i)"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="selectDay(i)"
+  >
+    <div class="day-name">{{ d.dayNameShort }}{{ d.eventEmoji }}</div>
+    <div class="day-date">{{ d.dateStr }}</div>
+    <div class="day-temp">{{ d.min }}° / {{ d.max }}°</div>
+  </div>
+</div>
+
+<h4 style="text-align: center; margin-top: 0.75rem;">
+  Hourly Forecast of
+  <span *ngIf="weather.city">{{ weather.city }}</span>
+  — <span *ngIf="days?.length">{{ days[selectedDayIndex]?.dayName }}</span>
+  🌦️
+</h4>
+
+<div *ngIf="selectedHourlyEntries?.length" class="hourly-cards-grid">
+  <div class="hour-card" *ngFor="let e of selectedHourlyEntries">
+    <div class="hour-top">🕓 {{ e.displayTime || (e.timeIso | date:'shortTime') }}</div>
+    <div class="hour-temp">🌡️ {{ e.temperature }} °C</div>
+    <div class="hour-event"> {{ e.event }}</div>
   </div>
 </div>
     </div>

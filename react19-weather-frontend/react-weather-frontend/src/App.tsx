@@ -94,7 +94,7 @@ export default function App() {
   return (
     <main className="main">
       <div className="content">
-        <h1 className="subtitle">Search Today's Live Weather Forecast🌦️</h1>
+        <h2 className="subtitle">Search Live Weather Forecast🌦️</h2>
 
         <SearchForm
           city={city}

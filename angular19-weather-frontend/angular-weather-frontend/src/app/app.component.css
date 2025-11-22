@@ -342,6 +342,61 @@ p {
   to { transform: rotate(360deg); }
 }
 
+/* Days row */
+.days-row {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding: 0.5rem 0.25rem;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 0.5rem;
+}
+
+/* non-selected: transparent look */
+.day-card {
+  min-width: 110px;
+  max-width: 140px;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(223,225,229,0.5);
+  background: transparent; /* changed: transparent by default */
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: none; /* reduce shadow for non-selected */
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+/* subtle hover for non-selected */
+.day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.04);
+}
+
+/* active: solid white, stronger shadow and accent border */
+.day-card.active {
+  border-color: #357ae8;
+  box-shadow: 0 8px 20px rgba(53,122,232,0.12);
+  background: rgba(255,255,255,0.96); /* changed: white-ish when selected */
+}
+
+/* keep text styling */
+.day-name { font-weight: 700; font-size: 0.95rem; }
+.day-date { font-size: 0.7rem; color: black; }
+.day-temp { font-weight: 600; font-size: 0.9rem; }
+.day-event { font-size: 1.1rem; }
+
+/* Ensure grid remains responsive */
+@media (max-width: 900px) {
+  .hourly-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+}
+
 /* Responsive Styles */
 @media screen and (max-width: 900px) {
   .weather-form-row {
@@ -397,10 +452,4 @@ p {
   .weather-input, .weather-btn {
     font-size: 1rem;
   }
-
-  @media screen and (max-width: 900px) {
-  .hourly-cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  }
-}
 }

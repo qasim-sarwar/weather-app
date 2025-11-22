@@ -137,6 +137,9 @@ export default function WeatherCard({ weather }: { weather: WeatherResponse | nu
               const isSelected = i === selectedDayIndex;
               const code = weather.daily?.weathercode?.[i];
               const codeInfo = getCodeInfo(code);
+              const min = weather.daily?.temperature_2m_min?.[i];
+              const max = weather.daily?.temperature_2m_max?.[i];
+
               return (
                 <button
                   key={dateStr}
@@ -144,10 +147,9 @@ export default function WeatherCard({ weather }: { weather: WeatherResponse | nu
                   className={`day-button ${isSelected ? 'selected' : ''}`}
                   aria-pressed={isSelected}
                 >
-                  {/* <div className="weather-icon" aria-hidden>{codeInfo.icon}</div> */}
                   <div className="day-short">{shortName} {codeInfo.icon}</div>
                   <div className="day-date">{new Date(dateStr).toLocaleDateString()}</div>
-                  <div className="day-event">{codeInfo.text}</div>
+                  <div className="day-temp">{typeof min !== 'undefined' ? `${min}°` : '-'} / {typeof max !== 'undefined' ? `${max}°` : '-'}</div>
                 </button>
               );
             })}
@@ -162,8 +164,8 @@ export default function WeatherCard({ weather }: { weather: WeatherResponse | nu
               const eventText = entry.event ?? codeInfo.text;
               return (
                 <div key={entry.timeIso ?? idx} className="hour-card">
-                  <div className="hour-top">{entry.displayTime ?? new Date(entry.timeIso ?? '').toLocaleTimeString([], { hour: 'numeric' })} {codeInfo.icon}</div>
-                  <div className="hour-temp">{typeof entry.temperature !== 'undefined' ? `${entry.temperature} °C` : '-'}</div>
+                  <div className="hour-top">🕓 {entry.displayTime ?? new Date(entry.timeIso ?? '').toLocaleTimeString([], { hour: 'numeric' })} {codeInfo.icon}</div>
+                  <div className="hour-temp">🌡️ {typeof entry.temperature !== 'undefined' ? `${entry.temperature} °C` : '-'}</div>
                   <div className="hour-event">{eventText}</div>
                 </div>
               );

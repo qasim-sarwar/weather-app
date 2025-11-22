@@ -43,8 +43,8 @@ html, body {
   width: 100%;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  flex-direction: column; /* allows vertical stacking */
+  justify-content: flex-start; /* content starts at top */
   align-items: center;
   padding: 2rem 1rem;
   box-sizing: border-box;
@@ -108,7 +108,8 @@ p { margin: 0; color: var(--gray-700); }
   border: 1px solid #dfe1e5;
   background: transparent; /* transparent like other cards */
   cursor: pointer;
-  min-width: 96px;
+  min-width: 110px;
+  max-width: 140px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -137,10 +138,10 @@ p { margin: 0; color: var(--gray-700); }
 }
 
 /* inside day button */
-.day-short { font-weight: 600; }
+.day-short { font-weight: 700; font-size: 0.95rem;}
 .day-date { font-size: 0.8rem; color: #000; } /* make date black */
-.day-event { font-size: 0.75rem; color: #000; margin-top: 2px; } /* event text black */
-
+.day-event { font-size: 0.75rem; color: white; margin-top: 2px; } /* event text black */
+.day-temp { font-size: 0.9rem; font-weight: 700; margin-top: 0.25rem; }
 /* hourly card tweaks to show icon + text */
 .hour-card { 
   display: flex;
@@ -151,12 +152,12 @@ p { margin: 0; color: var(--gray-700); }
 }
 
 /* ensure event text is readable (make fully black) */
-.hour-event { font-size: 0.85rem; color: #000; text-align: center; }
+.hour-event { font-size: 0.85rem; color: white; text-align: center; }
 
 /* center section title and make it black */
 .section-title { text-align: center; color: #000; margin-top: 0.5rem; }
 
 @media screen and (max-width:900px) {
-  .weather-form-row { flex-direction:column; gap:1.5rem; }
+  .weather-form-row { flex-direction:column; gap:1.5rem; align-items: center; gap: 1.5rem; }
   .weather-divider { display:none; }
 }
