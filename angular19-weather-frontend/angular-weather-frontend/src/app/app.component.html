@@ -1,6 +1,6 @@
 <main class="main">
   <div class="content">
-    <h2 class="subtitle">Search Todays Live Weather Forecast🌦️</h2>
+    <h2 class="subtitle">Search Live Weather Forecast🌦️</h2>
 
     <!-- Weather Form Section -->
     <div class="weather-form-row">
@@ -70,6 +70,7 @@
         Current Weather of
         <span *ngIf="weather.city">{{ weather.city }}</span>
         <span *ngIf="!weather.city">({{ weather.latitude }}, {{ weather.longitude }})</span>
+        <span>🕓 On: {{weather.day ?? ''}}</span>
       </h3>
 
       <div class="card-container">
