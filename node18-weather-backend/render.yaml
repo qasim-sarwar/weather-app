@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: weather-app-backend  # Change if you want a different service name
+    env: node
+    rootDir: node-backend      # Relative to repo root—handles everything automatically
+    buildCommand: npm install
+    startCommand: npm start    # Or "node server.js" if that's your script
